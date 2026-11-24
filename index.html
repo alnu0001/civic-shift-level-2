@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0c1830" />
+    <meta
+      name="description"
+      content="Civic Shift: First Failure — a browser-playable Level 01 proof of concept."
+    />
+    <title>Civic Shift — First Failure</title>
+    <link rel="preload" href="assets/civic-pips-character-sheet.png" as="image" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="game-shell" aria-label="Civic Shift browser game">
+      <section class="game-stage" aria-label="Civic Square game board">
+        <canvas id="gameCanvas" width="1440" height="900" tabindex="0" aria-label="Interactive Civic Square game map"></canvas>
+
+        <header class="top-hud" aria-label="Shift status">
+          <div class="brand-lockup">
+            <span class="brand-kicker">CITY COORDINATION BUREAU</span>
+            <h1>CIVIC <em>SHIFT</em></h1>
+          </div>
+          <div class="status-cluster">
+            <div class="health-card">
+              <div class="hud-label"><span>City Health</span><strong id="healthNumber">80</strong></div>
+              <div class="health-track" aria-label="City Health"><span id="healthFill"></span></div>
+            </div>
+            <div class="clock-card">
+              <span class="hud-label">SHIFT CLOCK</span>
+              <strong id="clock">08:00</strong>
+            </div>
+            <button id="soundToggle" class="icon-button" type="button" aria-label="Toggle sound" title="Toggle sound">◖))</button>
+          </div>
+        </header>
+
+        <section id="missionCard" class="mission-card" aria-live="polite">
+          <span class="mission-kicker">ACTIVE OBJECTIVE</span>
+          <strong id="missionText">Prepare the first shift.</strong>
+          <small id="missionHint">Choose a role, then begin when ready.</small>
+        </section>
+
+        <aside class="incident-panel" aria-label="Incident feed">
+          <div class="panel-heading">
+            <span class="live-dot"></span>
+            <span>LENS INCIDENT FEED</span>
+          </div>
+          <ol id="incidentFeed"></ol>
+        </aside>
+
+        <section class="role-deck" aria-label="Role tools">
+          <div class="role-deck-head">
+            <span>SELECTED ROLE</span>
+            <strong id="activeRoleName">DISPATCHER</strong>
+            <span class="role-key-help">Keys 1–4 switch roles</span>
+          </div>
+          <div class="role-controls">
+            <button class="role-card is-active" data-role="dispatcher" type="button">
+              <span class="role-key">1</span><span class="role-dot role-blue"></span>
+              <span><b>Dispatcher</b><small>Authorize priority</small></span>
+            </button>
+            <button class="role-card" data-role="signal" type="button">
+              <span class="role-key">2</span><span class="role-dot role-teal"></span>
+              <span><b>Signal</b><small>Change light phases</small></span>
+            </button>
+            <button class="role-card" data-role="route" type="button">
+              <span class="role-key">3</span><span class="role-dot role-amber"></span>
+              <span><b>Route</b><small>Open detours</small></span>
+            </button>
+            <button class="role-card" data-role="field" type="button">
+              <span class="role-key">4</span><span class="role-dot role-coral"></span>
+              <span><b>Field</b><small>Repair blockages</small></span>
+            </button>
+          </div>
+          <div class="tool-row">
+            <button id="primaryAction" class="primary-action" type="button">Authorize hospital priority</button>
+            <p id="toolHelp">Click the glowing hospital beacon once the ambulance is inbound.</p>
+          </div>
+        </section>
+
+        <section id="startOverlay" class="overlay start-overlay" aria-labelledby="gameTitle">
+          <div class="overlay-panel">
+            <div class="eyebrow"><span></span> LEVEL 01 — PROOF OF CONCEPT</div>
+            <h2 id="gameTitle">FIRST FAILURE:<br /><i>CIVIC SQUARE</i></h2>
+            <p class="intro-copy">
+              Luma Bay’s new smart-traffic system has mistaken a school bus for a parade.
+              Keep the ambulance lane open before the square becomes a standing festival.
+            </p>
+            <div class="crew-preview" aria-hidden="true">
+              <img src="assets/civic-pips-character-sheet.png" alt="" />
+            </div>
+            <div class="mode-picker" role="group" aria-label="Shift length">
+              <button data-mode="quick" class="mode-choice is-selected" type="button"><b>Quick test</b><span>3½ min</span></button>
+              <button data-mode="full" class="mode-choice" type="button"><b>Full shift</b><span>8 min</span></button>
+            </div>
+            <button id="startButton" class="start-button" type="button">Begin the shift</button>
+            <p class="control-note">Mouse: select map actions · 1–4: roles · M: mute · R: restart</p>
+          </div>
+        </section>
+
+        <section id="resultOverlay" class="overlay result-overlay is-hidden" aria-live="assertive">
+          <div class="result-panel">
+            <div id="resultEyebrow" class="eyebrow"><span></span> SHIFT REPORT</div>
+            <h2 id="resultTitle">CIVIC SQUARE SAVED</h2>
+            <p id="resultSummary"></p>
+            <div class="score-grid">
+              <div><span>City Health</span><b id="resultHealth">—</b></div>
+              <div><span>Ambulance</span><b id="resultAmbulance">—</b></div>
+              <div><span>Shift Score</span><b id="resultScore">—</b></div>
+            </div>
+            <div class="result-actions">
+              <button id="retryButton" class="start-button" type="button">Run another shift</button>
+              <button id="menuButton" class="secondary-button" type="button">Return to briefing</button>
+            </div>
+          </div>
+        </section>
+
+        <div id="toast" class="toast" role="status" aria-live="polite"></div>
+      </section>
+    </main>
+    <script src="src/game.js"></script>
+  </body>
+</html>
