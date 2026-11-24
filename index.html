@@ -3,20 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>City Ranger — Mission 1</title>
+<title>City Ranger — Harbor Junction</title>
 <style>
-*{box-sizing:border-box}body{margin:0;overflow:hidden;background:#07121f;color:#ecf7ff;font-family:Arial,sans-serif}canvas{display:block}
-#ui{position:fixed;inset:0;pointer-events:none}.card{background:#0b2039e9;border:1px solid #426a89;border-radius:13px;box-shadow:0 10px 28px #0008}
-#brand,#stats,#brief,#command,#overlay{pointer-events:auto}
-#brand{position:absolute;top:18px;left:22px}small{display:block;color:#a9c8df;letter-spacing:2px;font-size:10px}h1{margin:3px 0;font-size:29px;letter-spacing:1px}h1 i{color:#ffcb57}
-#stats{position:absolute;right:20px;top:20px;width:228px;padding:13px}.stat{margin:7px 0}.bar{height:9px;background:#17334d;border-radius:8px;overflow:hidden;margin-top:4px}.bar b{display:block;height:100%;background:#57dda0;width:100%;transition:.3s}
-#brief{position:absolute;top:112px;left:20px;width:290px;padding:14px;font-size:14px;line-height:1.42}#brief p{margin:7px 0;color:#d1e1ed}
-#command{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);width:min(600px,92vw);padding:13px;text-align:center}
-#command p{margin:4px 0 10px;color:#d0e1ec;font-size:14px}button{font:inherit;font-weight:bold;cursor:pointer}
-#order{border:0;border-radius:9px;background:#ffc653;color:#142537;padding:13px 22px;font-size:15px}#order:hover{background:#ffe08c}
-#toast{position:absolute;top:51%;left:50%;transform:translate(-50%,-50%);font-size:18px;font-weight:bold;text-align:center;text-shadow:0 2px 4px #000;width:90%}
-#overlay{position:fixed;inset:0;background:#06111eea;display:flex;align-items:center;justify-content:center}.panel{max-width:550px;padding:32px;text-align:center;margin:20px}.panel h2{font-size:37px;margin:7px 0;color:#fff}.panel p{line-height:1.55;color:#c9dbe8}.start{border:0;border-radius:9px;background:#62ddca;color:#062033;padding:14px 27px;font-size:16px}.hide{display:none!important}
-@media(max-width:640px){#brief{top:96px;width:225px;font-size:12px}#stats{width:180px;right:10px;top:10px}#brand{top:10px;left:12px}h1{font-size:22px}#command{bottom:12px}}
+*{box-sizing:border-box}body{margin:0;overflow:hidden;background:#08131f;color:#eff9ff;font-family:Arial,sans-serif}canvas{display:block}
+#ui{position:fixed;inset:0;pointer-events:none}.card{background:#092038ec;border:1px solid #47708c;border-radius:14px;box-shadow:0 10px 28px #0008}
+#brand,#mission,#stats,#command,#overlay{pointer-events:auto}#brand{position:absolute;top:18px;left:22px}small{display:block;font-size:10px;letter-spacing:2px;color:#a9cce1}h1{margin:3px 0;font-size:29px}h1 i{color:#ffca54}
+#stats{position:absolute;right:20px;top:20px;padding:13px;width:230px}.bar{height:9px;border-radius:7px;background:#193751;overflow:hidden;margin:5px 0 10px}.bar b{display:block;width:100%;height:100%;background:#5ce0a1;transition:.3s}
+#mission{position:absolute;left:20px;top:110px;width:300px;padding:14px;font-size:14px;line-height:1.4}#mission p{color:#d4e5f0;margin:7px 0}
+#command{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);width:min(590px,92vw);padding:13px;text-align:center}#command p{margin:4px 0 10px;color:#d2e2ed}
+button{cursor:pointer;font:inherit;font-weight:bold}#order,.start{border:0;border-radius:10px;padding:13px 22px;background:#ffc752;color:#102437}#order:hover,.start:hover{background:#ffe296}#order:disabled{background:#536a7a;color:#c9d8df}
+#toast{position:absolute;top:51%;left:50%;transform:translate(-50%,-50%);font-weight:bold;font-size:18px;text-align:center;text-shadow:0 2px 4px #000;width:90%}
+#overlay{position:fixed;inset:0;background:#06111eea;display:flex;align-items:center;justify-content:center}.panel{max-width:540px;margin:20px;padding:31px;text-align:center}.panel h2{font-size:36px;margin:8px 0}.panel p{line-height:1.55;color:#cbddea}.hide{display:none!important}
 </style>
 </head>
 <body>
@@ -26,22 +23,23 @@
   <div id="brand"><small>CITY EMERGENCY RESPONSE</small><h1>CITY <i>RANGER</i></h1></div>
 
   <div id="stats" class="card">
-    <div class="stat"><small>CITY CONDITION <span id="condition">100</span>%</small><div class="bar"><b id="conditionBar"></b></div></div>
-    <div class="stat"><small>MEDICAL WINDOW <span id="timer">01:30</span></small><div class="bar"><b id="timeBar" style="background:#ffbf52"></b></div></div>
-    <small>MISSION 1 · HARBOR JUNCTION</small>
+    <small>CITY CONDITION <span id="condition">100</span>%</small>
+    <div class="bar"><b id="conditionBar"></b></div>
+    <small>MEDICAL WINDOW <span id="clock">01:30</span></small>
+    <div class="bar"><b id="timeBar" style="background:#ffc752"></b></div>
   </div>
 
-  <div id="brief" class="card">
-    <small>● ACTIVE EMERGENCY</small>
-    <p id="objective">A school bus has broken down in the emergency lane. An ambulance is approaching.</p>
-    <p id="instruction">Issue the first order to protect the patient.</p>
+  <div id="mission" class="card">
+    <small>● HARBOR JUNCTION EMERGENCY</small>
+    <p id="objective">A school bus has broken down in the emergency lane.</p>
+    <p id="help">Activate emergency priority before the ambulance reaches the junction.</p>
   </div>
 
   <div id="toast"></div>
 
   <div id="command" class="card">
-    <small>NEXT ORDER</small>
-    <p id="orderText">Activate emergency signal priority.</p>
+    <small>NEXT RANGER ORDER</small>
+    <p id="orderText">Give the ambulance priority at the traffic signal.</p>
     <button id="order">ACTIVATE EMERGENCY SIGNAL</button>
   </div>
 </div>
@@ -50,192 +48,194 @@
   <div class="panel card">
     <small>MISSION 1 · HARBOR JUNCTION</small>
     <h2>KEEP THE AMBULANCE MOVING</h2>
-    <p>A school bus has broken down in Harbor Junction's emergency lane. An ambulance carrying a critical patient is approaching the intersection.</p>
-    <p>You are the City Ranger. Give orders, clear the route, and get the ambulance through before time runs out.</p>
-    <p><small>Click the yellow command button or press SPACE.</small></p>
+    <p>A school bus has broken down in Harbor Junction's emergency lane. An ambulance carrying a critical patient is approaching.</p>
+    <p>You are the City Ranger. Direct the traffic officer, tow crew, and emergency route so the patient reaches care safely.</p>
     <button class="start" id="start">BEGIN RESPONSE</button>
   </div>
 </div>
 
 <script>
-const canvas=document.querySelector("#game"),ctx=canvas.getContext("2d"),$=s=>document.querySelector(s);
-let W,H,running=false,won=false,stage=0,condition=100,remaining=90,last=0,audio=null,toastTimeout;
-let bus,tow,ambulance,traffic=[],signalGreen=false;
+const c=document.querySelector("#game"),x=c.getContext("2d"),$=s=>document.querySelector(s);
+let W,H,start=false,stage=0,condition=100,time=90,last=0,audio,siren,toastTimer;
+let busX,towX,ambulanceX,traffic=[],officer=false,crew=false,busMoving=false,complete=false;
 
-function resize(){
-  W=canvas.width=innerWidth; H=canvas.height=innerHeight;
-}
+function resize(){W=c.width=innerWidth;H=c.height=innerHeight}
 addEventListener("resize",resize);resize();
 
-function sound(freq,duration=.12,type="sine",volume=.045){
+function tone(f,d=.12,type="sine",v=.045){
   if(!audio)return;
-  const o=audio.createOscillator(),gain=audio.createGain();
-  o.type=type;o.frequency.value=freq;gain.gain.value=volume;
-  o.connect(gain).connect(audio.destination);o.start();
-  gain.gain.exponentialRampToValueAtTime(.001,audio.currentTime+duration);
-  o.stop(audio.currentTime+duration);
+  let o=audio.createOscillator(),g=audio.createGain();
+  o.type=type;o.frequency.value=f;g.gain.value=v;
+  o.connect(g).connect(audio.destination);o.start();
+  g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+d);o.stop(audio.currentTime+d);
 }
-function message(text){
-  $("#toast").textContent=text;clearTimeout(toastTimeout);
-  toastTimeout=setTimeout(()=>$("#toast").textContent="",2300);
+function busBreak(){
+  tone(100,.24,"sawtooth",.07);
+  setTimeout(()=>tone(70,.32,"square",.06),160);
+  setTimeout(()=>tone(130,.10,"square",.04),430);
 }
-function car(lane,x,color,name="",speed=.8,w=43){
-  return {lane,x,color,name,speed,v:speed,w,h:24};
+function ambulanceSiren(){
+  if(stage<1||complete)return;
+  tone(700,.18,"square",.022);
+  setTimeout(()=>tone(1040,.18,"square",.022),190);
 }
-function resetWorld(){
-  const east=H*.50,west=H*.68;
-  bus=car("east",W*.53-30,"#f1b842","SCHOOL BUS",0,67);
-  ambulance=car("east",-80,"#e95d56","AMBULANCE",1.12,58);
-  tow=car("east",-170,"#55c4de","TOW",.75,50);
+function say(s){
+  $("#toast").textContent=s;clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>$("#toast").textContent="",2300);
+}
+function setup(){
+  busX=W*.61;towX=-130;ambulanceX=-130;
   traffic=[
-    car("east",W*.06,"#4d9fe6","",.78),car("east",W*.23,"#d780d9","",.70),
-    car("east",W*.38,"#f2b847","",.75),car("west",W*.91,"#f4f3ee","",.78),
-    car("west",W*.72,"#65c8ba","",.70),car("west",W*.46,"#8c79d5","",.74),
-    car("west",W*.19,"#e67d8b","",.68)
+    {x:W*.05,color:"#4f9fe8",speed:.72},
+    {x:W*.19,color:"#d67ec7",speed:.66},
+    {x:W*.34,color:"#f1b846",speed:.70},
+    {x:W*.78,color:"#7c91e7",speed:.76},
+    {x:W*.92,color:"#65c8ba",speed:.67}
   ];
 }
-function startGame(){
+function setCommand(text,label){
+  $("#orderText").textContent=text;$("#order").textContent=label;
+}
+$("#start").onclick=()=>{
   audio=new(window.AudioContext||window.webkitAudioContext)();
-  sound(520,.15,"triangle");running=true;resetWorld();
-  $("#overlay").classList.add("hide");
-  message("Emergency received. Set priority for the ambulance.");
-}
-$("#start").onclick=startGame;
-$("#order").onclick=issueOrder;
-addEventListener("keydown",e=>{if(e.code==="Space"){e.preventDefault();issueOrder();}});
+  start=true;setup();$("#overlay").classList.add("hide");
+  setTimeout(busBreak,350);
+  say("School bus breakdown reported. Emergency lane blocked.");
+};
+$("#order").onclick=act;
+addEventListener("keydown",e=>{if(e.code==="Space"){e.preventDefault();act()}});
 
-function setOrder(label,description,button){
-  $("#orderText").textContent=description;$("#order").textContent=button;
-  $("#objective").textContent=label;
-}
-function issueOrder(){
-  if(!running||won)return;
+function act(){
+  if(!start||complete)return;
 
   if(stage===0){
-    stage=1;signalGreen=true;sound(780,.18,"triangle");
-    setOrder(
-      "Emergency priority is active. Regular traffic is stopping at Harbor Junction.",
-      "Dispatch a tow truck to remove the school bus.",
-      "DISPATCH TOW TRUCK"
-    );
-    message("EMERGENCY SIGNAL ACTIVATED");
+    stage=1;officer=true;tone(780,.16,"triangle");
+    siren=setInterval(ambulanceSiren,780);
+    $("#objective").textContent="Emergency signal active. The traffic officer is holding regular vehicles.";
+    $("#help").textContent="Dispatch the tow crew to clear the school bus.";
+    setCommand("Send the tow truck and road crew into the emergency lane.","DISPATCH TOW CREW");
+    say("TRAFFIC OFFICER: EMERGENCY PRIORITY ACTIVE");
+
   }else if(stage===1){
-    stage=2;tow.v=.90;sound(620,.15,"square");
-    setOrder(
-      "Tow truck dispatched. Keep the emergency lane protected while it reaches the bus.",
-      "Confirm the recovery crew may clear the school bus.",
-      "CLEAR SCHOOL BUS"
-    );
-    message("TOW TRUCK DISPATCHED");
-  }else if(stage===2){
-    if(tow.x<bus.x-85)return message("The tow truck has not reached the bus yet.");
-    stage=3;bus.speed=.95;bus.v=.95;sound(860,.15,"triangle");
-    setOrder(
-      "The school bus is moving out of the emergency lane. The ambulance can proceed.",
-      "Maintain the emergency corridor until the ambulance exits.",
-      "HOLD EMERGENCY CORRIDOR"
-    );
-    message("BUS CLEARED — AMBULANCE RELEASED");
+    stage=2;crew=true;tone(580,.16,"triangle");
+    $("#objective").textContent="Tow truck is approaching the broken-down bus.";
+    $("#help").textContent="Wait until the road crew reaches the bus.";
+    $("#order").disabled=true;$("#order").textContent="TOW CREW EN ROUTE";
+    say("TOW CREW DISPATCHED");
+
   }else if(stage===3){
-    stage=4;sound(930,.14,"sine");
-    message("CORRIDOR CONFIRMED");
-    $("#order").disabled=true;$("#order").textContent="EMERGENCY CORRIDOR ACTIVE";
+    stage=4;busMoving=true;tone(860,.14,"triangle");
+    $("#objective").textContent="The school bus is being towed clear. The ambulance has a safe corridor.";
+    $("#help").textContent="Keep the emergency signal active until the ambulance exits.";
+    $("#order").disabled=true;$("#order").textContent="CORRIDOR ACTIVE";
+    say("BUS CLEARED — AMBULANCE RELEASED");
   }
 }
 
-function moveVehicle(v,dt,leader){
-  let target=v.speed;
-  if(v===bus&&stage<3)target=0;
-  if(v===ambulance&&stage<3)target=0;
-  if(v===tow&&stage<2)target=0;
-
-  if(v.lane==="east"){
-    if(!signalGreen&&v!==ambulance&&v.x>W*.42&&v.x<W*.49)target=0;
-    if(leader){
-      let gap=leader.x-v.x;
-      if(gap<72)target=Math.min(target,Math.max(0,(gap-38)*.025));
-    }
-    v.v+=(target-v.v)*Math.min(1,dt*3);
-    v.x+=v.v*60*dt;
-    if(v!==bus&&v.x>W+100)v.x=-90;
-  }else{
-    if(leader){
-      let gap=v.x-leader.x;
-      if(gap<72)target=Math.min(target,Math.max(0,(gap-38)*.025));
-    }
-    v.v+=(target-v.v)*Math.min(1,dt*3);
-    v.x-=v.v*60*dt;
-    if(v.x<-100)v.x=W+90;
-  }
-}
 function update(dt){
-  if(!running||won)return;
-  remaining=Math.max(0,remaining-dt);
-  condition=Math.max(0,condition-dt*(stage>=3?.04:.40));
+  if(!start||complete)return;
+
+  time=Math.max(0,time-dt);
+  condition=Math.max(0,condition-dt*(busMoving?.06:.38));
   $("#condition").textContent=Math.ceil(condition);
   $("#conditionBar").style.width=condition+"%";
-  $("#timeBar").style.width=(remaining/90*100)+"%";
-  let secs=Math.ceil(remaining);
-  $("#timer").textContent="01:"+(secs<60?String(secs).padStart(2,"0"):"00");
+  $("#timeBar").style.width=(time/90*100)+"%";
+  let sec=Math.ceil(time);
+  $("#clock").textContent="01:"+String(Math.min(59,sec)).padStart(2,"0");
 
-  let east=[...traffic.filter(v=>v.lane==="east"),bus,tow,ambulance].sort((a,b)=>b.x-a.x);
-  let west=traffic.filter(v=>v.lane==="west").sort((a,b)=>a.x-b.x);
-  east.forEach((v,i)=>moveVehicle(v,dt,east[i-1]));
-  west.forEach((v,i)=>moveVehicle(v,dt,west[i-1]));
-
-  if(stage===3&&ambulance.x>W+35){
-    won=true;sound(880,.18,"triangle");setTimeout(()=>sound(1175,.35,"triangle"),180);
-    $("#overlay").classList.remove("hide");
-    $("#overlay .panel").innerHTML=`
-      <small>MISSION COMPLETE</small>
-      <h2>PATIENT DELIVERED SAFELY</h2>
-      <p>You cleared Harbor Junction and preserved the medical route.</p>
-      <p><b>City condition: ${Math.ceil(condition)}%</b></p>
-      <button class="start" onclick="location.reload()">PLAY AGAIN</button>`;
+  for(let i=0;i<traffic.length;i++){
+    let car=traffic[i],target=car.speed;
+    if(stage===0&&car.x>W*.43&&car.x<busX-65)target=.12;
+    if(stage>=1&&car.x>W*.43&&car.x<busX-65)target=.34;
+    let ahead=traffic[i+1];
+    if(ahead&&ahead.x-car.x<67)target=Math.min(target,.08);
+    car.x+=target*60*dt;
+    if(car.x>W+60)car.x=-65;
   }
-  if(remaining<=0||condition<=0){
-    won=true;
+
+  if(stage>=2&&towX<busX-72)towX+=.86*60*dt;
+
+  if(stage===2&&towX>=busX-72){
+    stage=3;
+    $("#objective").textContent="Tow crew has reached the school bus.";
+    $("#help").textContent="Authorize the crew to pull the bus out of the emergency lane.";
+    $("#order").disabled=false;
+    setCommand("Clear the bus and release the ambulance route.","CLEAR SCHOOL BUS");
+    say("TOW CREW READY FOR AUTHORIZATION");
+  }
+
+  if(busMoving)busX+=.85*60*dt;
+  if(stage>=4)ambulanceX+=1.18*60*dt;
+  else if(stage>=1)ambulanceX=Math.min(W*.30,ambulanceX+.55*60*dt);
+
+  if(stage>=4&&ambulanceX>W+70){
+    complete=true;clearInterval(siren);
+    tone(900,.16,"triangle");setTimeout(()=>tone(1180,.35,"triangle"),180);
     $("#overlay").classList.remove("hide");
-    $("#overlay .panel").innerHTML=`
-      <small>MISSION FAILED</small>
-      <h2>THE ROUTE CLOSED</h2>
-      <p>The emergency response took too long. Try a faster response.</p>
-      <button class="start" onclick="location.reload()">TRY AGAIN</button>`;
+    $("#overlay .panel").innerHTML="<small>MISSION COMPLETE</small><h2>PATIENT DELIVERED SAFELY</h2><p>The emergency corridor stayed open and the ambulance reached the hospital route.</p><p><b>City condition: "+Math.ceil(condition)+"%</b></p><button class='start' onclick='location.reload()'>PLAY AGAIN</button>";
+  }
+  if(time<=0||condition<=0){
+    complete=true;clearInterval(siren);
+    $("#overlay").classList.remove("hide");
+    $("#overlay .panel").innerHTML="<small>MISSION FAILED</small><h2>THE ROUTE CLOSED</h2><p>The city response took too long. Try again and issue orders faster.</p><button class='start' onclick='location.reload()'>TRY AGAIN</button>";
   }
 }
 
-function drawVehicle(v,y){
-  ctx.fillStyle="#111a24";ctx.fillRect(v.x-3,y-7,v.w+6,v.h+5);
-  ctx.fillStyle=v.color;ctx.fillRect(v.x,y-10,v.w,v.h);
-  ctx.fillStyle="#ccecf4";ctx.fillRect(v.x+6,y-7,v.w*.28,7);ctx.fillRect(v.x+v.w*.62,y-7,v.w*.22,7);
-  ctx.fillStyle="#091522";ctx.fillRect(v.x+5,y+12,9,5);ctx.fillRect(v.x+v.w-14,y+12,9,5);
-  if(v.name){ctx.fillStyle="#fff";ctx.font="bold 9px Arial";ctx.fillText(v.name,v.x+5,y+5);}
+function car(xp,yp,w,color,label=""){
+  x.fillStyle="#101b27";x.fillRect(xp-3,yp+5,w+6,25);
+  x.fillStyle=color;x.fillRect(xp,yp,w,23);
+  x.fillStyle="#bfe9f0";x.fillRect(xp+6,yp+3,w*.28,7);x.fillRect(xp+w*.62,yp+3,w*.20,7);
+  x.fillStyle="#07121d";x.fillRect(xp+5,yp+21,9,5);x.fillRect(xp+w-14,yp+21,9,5);
+  if(label){x.fillStyle="#fff";x.font="bold 9px Arial";x.fillText(label,xp+5,yp+16);}
+}
+function ambulance(xp,yp){
+  car(xp,yp,64,"#f4f7f5","AMBULANCE");
+  x.fillStyle="#e64048";x.fillRect(xp+10,yp+7,12,10);x.fillRect(xp+14,yp+4,4,16);x.fillRect(xp+8,yp+10,16,4);
+  x.fillStyle=(Math.floor(performance.now()/170)%2)?"#ff4c55":"#54bdf0";
+  x.fillRect(xp+38,yp-4,10,5);
+}
+function bus(xp,yp){
+  car(xp,yp,70,"#f1b83e","SCHOOL BUS");
+  x.fillStyle="#ffdf70";x.fillRect(xp+8,yp+4,8,7);x.fillRect(xp+21,yp+4,8,7);x.fillRect(xp+34,yp+4,8,7);
+  if(!busMoving){x.fillStyle="#ff6a45";x.beginPath();x.arc(xp+63,yp-4,4,0,7);x.fill();}
+}
+function towTruck(xp,yp){
+  car(xp,yp,58,"#42bad1","TOW");
+  x.strokeStyle="#cfe8ee";x.lineWidth=3;x.beginPath();x.moveTo(xp+44,yp+3);x.lineTo(xp+61,yp-14);x.lineTo(xp+68,yp+3);x.stroke();
+}
+function person(px,py,color,label){
+  x.fillStyle="#eadba5";x.beginPath();x.arc(px,py-15,10,0,7);x.fill();
+  x.fillStyle="#1a2635";x.fillRect(px-4,py-17,2,2);x.fillRect(px+3,py-17,2,2);
+  x.fillStyle=color;x.fillRect(px-11,py-4,22,25);
+  x.fillStyle="#172434";x.fillRect(px-8,py+20,6,7);x.fillRect(px+3,py+20,6,7);
+  x.fillStyle="#fff";x.font="bold 9px Arial";x.fillText(label,px-15,py+39);
 }
 function draw(){
-  const east=H*.50,west=H*.68,cx=W*.52;
-  ctx.clearRect(0,0,W,H);
-  ctx.fillStyle="#86ca87";ctx.fillRect(0,0,W,H);
-  ctx.fillStyle="#72b9d1";ctx.fillRect(0,H*.2,W,H*.62);
+  let roadY=H*.53,grass=H*.22;
+  x.clearRect(0,0,W,H);
+  x.fillStyle="#89ca88";x.fillRect(0,0,W,H);
+  x.fillStyle="#76bdd4";x.fillRect(0,grass,W,H*.58);
+  x.fillStyle="#2b4052";x.fillRect(0,roadY-72,W,145);
+  x.strokeStyle="#e3ca79";x.lineWidth=3;x.setLineDash([22,18]);
+  x.beginPath();x.moveTo(0,roadY);x.lineTo(W,roadY);x.stroke();x.setLineDash([]);
 
-  for(const y of [east,west]){
-    ctx.fillStyle="#2a4052";ctx.fillRect(0,y-54,W,108);
-    ctx.strokeStyle="#e2c875";ctx.lineWidth=3;ctx.setLineDash([20,18]);
-    ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();ctx.setLineDash([]);
-  }
+  x.fillStyle="#587a61";x.fillRect(W*.48,grass,125,H*.58);
+  x.fillStyle="#82ad7d";x.fillRect(W*.50,grass+18,84,H*.54);
+  x.fillStyle="#cadfd2";x.beginPath();x.arc(W*.54,H*.63,74,0,7);x.fill();
+  x.fillStyle="#83a5ac";x.beginPath();x.arc(W*.54,H*.63,57,0,7);x.fill();
 
-  ctx.fillStyle="#547861";ctx.fillRect(cx-65,H*.2,130,H*.62);
-  ctx.fillStyle="#7fad7d";ctx.fillRect(cx-47,H*.22,94,H*.58);
-  ctx.fillStyle="#c8ded1";ctx.beginPath();ctx.arc(cx,H*.59,80,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle="#75949e";ctx.beginPath();ctx.arc(cx,H*.59,63,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle="#9cdfeb";ctx.beginPath();ctx.arc(cx,H*.59,39,0,Math.PI*2);ctx.fill();
+  traffic.forEach(v=>car(v.x,roadY-11,42,v.color));
+  bus(busX,roadY-11);
+  if(stage>=2)towTruck(towX,roadY+28);
+  ambulance(ambulanceX,roadY-46);
 
-  traffic.forEach(v=>drawVehicle(v,v.lane==="east"?east:west));
-  drawVehicle(bus,east);drawVehicle(tow,east);drawVehicle(ambulance,east);
+  if(officer)person(W*.44,roadY-118,"#4f9fe8","OFFICER");
+  if(crew&&towX>W*.1)person(Math.min(towX+20,busX-52),roadY+67,"#ffb94c","TOW CREW");
+  person(W*.18,H*.79,"#57d8cb","RANGER");
 
-  ctx.fillStyle=signalGreen?"#59e3a0":"#ea5d56";
-  ctx.beginPath();ctx.arc(cx+105,east-46,18,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle="#132434";ctx.font="bold 10px Arial";
-  ctx.fillText(signalGreen?"GREEN":"STOP",cx+89,east-42);
+  x.fillStyle=stage>=1?"#59e0a0":"#ea5d56";
+  x.beginPath();x.arc(W*.45,roadY-48,18,0,7);x.fill();
+  x.fillStyle="#102434";x.font="bold 9px Arial";x.fillText(stage>=1?"GO":"STOP",W*.439,roadY-45);
 
   requestAnimationFrame(loop);
 }
