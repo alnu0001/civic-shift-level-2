@@ -3,230 +3,247 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Civic Shift — First Failure</title>
+<title>City Ranger — Mission 1</title>
 <style>
-*{box-sizing:border-box}body{margin:0;overflow:hidden;background:#071222;color:#eef8ff;font-family:system-ui,Arial,sans-serif}canvas{display:block}#hud{position:fixed;inset:0;pointer-events:none}#brand,#status,#mission,#roles,#action,#overlay{pointer-events:auto}.card{background:#0c2038e8;border:1px solid #3f6684;border-radius:13px;box-shadow:0 10px 30px #0008}#brand{position:absolute;top:18px;left:20px}#brand small,#status small,#mission small{display:block;font-size:10px;letter-spacing:2px;color:#9fc2db}h1{margin:2px 0;font-size:27px;letter-spacing:1px}h1 i{color:#69dfd0}#status{position:absolute;right:20px;top:20px;width:225px;padding:12px}#bar{height:10px;background:#142e49;border-radius:8px;overflow:hidden;margin:7px 0}#bar b{display:block;width:82%;height:100%;background:#55e2a0;transition:width .25s}#mission{position:absolute;left:20px;top:115px;width:280px;padding:13px;font-size:14px;line-height:1.35}#mission p{margin:7px 0;color:#c7d9e7}#roles{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);display:flex;gap:8px}.role,#action,.start{border:1px solid #416988;border-radius:10px;background:#122d4b;color:#e8f7ff;padding:11px 14px;font-weight:700;cursor:pointer}.role:hover,.role.active{background:#216074;border-color:#7eebdd}#action{position:absolute;right:20px;bottom:20px;background:#f5ba48;color:#132238;border:0;padding:15px 18px}#toast{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);font-weight:800;font-size:18px;text-shadow:0 2px 4px #000;text-align:center;width:90%}#overlay{position:fixed;inset:0;background:#06121de8;display:flex;align-items:center;justify-content:center}.panel{max-width:540px;text-align:center;padding:30px;margin:18px}.panel h2{font-size:36px;margin:8px 0}.panel p{line-height:1.55;color:#c5d7e7}.start{border:0;background:#62ddca;color:#082033;font-size:16px;margin-top:8px}.hide{display:none!important}@media(max-width:650px){#mission{top:100px;width:230px;font-size:12px}#roles{width:100%;padding:0 10px;gap:4px}.role{padding:9px 7px;font-size:11px}#action{right:10px;bottom:67px;font-size:11px;padding:10px}}
+*{box-sizing:border-box}body{margin:0;overflow:hidden;background:#07121f;color:#ecf7ff;font-family:Arial,sans-serif}canvas{display:block}
+#ui{position:fixed;inset:0;pointer-events:none}.card{background:#0b2039e9;border:1px solid #426a89;border-radius:13px;box-shadow:0 10px 28px #0008}
+#brand,#stats,#brief,#command,#overlay{pointer-events:auto}
+#brand{position:absolute;top:18px;left:22px}small{display:block;color:#a9c8df;letter-spacing:2px;font-size:10px}h1{margin:3px 0;font-size:29px;letter-spacing:1px}h1 i{color:#ffcb57}
+#stats{position:absolute;right:20px;top:20px;width:228px;padding:13px}.stat{margin:7px 0}.bar{height:9px;background:#17334d;border-radius:8px;overflow:hidden;margin-top:4px}.bar b{display:block;height:100%;background:#57dda0;width:100%;transition:.3s}
+#brief{position:absolute;top:112px;left:20px;width:290px;padding:14px;font-size:14px;line-height:1.42}#brief p{margin:7px 0;color:#d1e1ed}
+#command{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);width:min(600px,92vw);padding:13px;text-align:center}
+#command p{margin:4px 0 10px;color:#d0e1ec;font-size:14px}button{font:inherit;font-weight:bold;cursor:pointer}
+#order{border:0;border-radius:9px;background:#ffc653;color:#142537;padding:13px 22px;font-size:15px}#order:hover{background:#ffe08c}
+#toast{position:absolute;top:51%;left:50%;transform:translate(-50%,-50%);font-size:18px;font-weight:bold;text-align:center;text-shadow:0 2px 4px #000;width:90%}
+#overlay{position:fixed;inset:0;background:#06111eea;display:flex;align-items:center;justify-content:center}.panel{max-width:550px;padding:32px;text-align:center;margin:20px}.panel h2{font-size:37px;margin:7px 0;color:#fff}.panel p{line-height:1.55;color:#c9dbe8}.start{border:0;border-radius:9px;background:#62ddca;color:#062033;padding:14px 27px;font-size:16px}.hide{display:none!important}
+@media(max-width:640px){#brief{top:96px;width:225px;font-size:12px}#stats{width:180px;right:10px;top:10px}#brand{top:10px;left:12px}h1{font-size:22px}#command{bottom:12px}}
 </style>
 </head>
 <body>
 <canvas id="game"></canvas>
 
-<div id="hud">
-<div id="brand"><small>CITY COORDINATION BUREAU</small><h1>CIVIC <i>SHIFT</i></h1></div>
-<div id="status" class="card"><small>CITY HEALTH <span id="hp">82</span></small><div id="bar"><b id="fill"></b></div><small>SHIFT CLOCK: <span id="clock">08:00</span> · SOUND ON</small></div>
-<div id="mission" class="card"><small>● LIVE INCIDENT FEED</small><p id="objective">A stalled school bus blocks the ambulance lane.</p><p id="hint">Start the shift, then authorize hospital priority.</p></div>
-<div id="toast"></div>
-<div id="roles">
-<button class="role active" data-r="dispatch">1 Dispatcher</button>
-<button class="role" data-r="signal">2 Signal</button>
-<button class="role" data-r="route">3 Route</button>
-<button class="role" data-r="field">4 Field</button>
-</div>
-<button id="action">AUTHORIZE PRIORITY</button>
+<div id="ui">
+  <div id="brand"><small>CITY EMERGENCY RESPONSE</small><h1>CITY <i>RANGER</i></h1></div>
+
+  <div id="stats" class="card">
+    <div class="stat"><small>CITY CONDITION <span id="condition">100</span>%</small><div class="bar"><b id="conditionBar"></b></div></div>
+    <div class="stat"><small>MEDICAL WINDOW <span id="timer">01:30</span></small><div class="bar"><b id="timeBar" style="background:#ffbf52"></b></div></div>
+    <small>MISSION 1 · HARBOR JUNCTION</small>
+  </div>
+
+  <div id="brief" class="card">
+    <small>● ACTIVE EMERGENCY</small>
+    <p id="objective">A school bus has broken down in the emergency lane. An ambulance is approaching.</p>
+    <p id="instruction">Issue the first order to protect the patient.</p>
+  </div>
+
+  <div id="toast"></div>
+
+  <div id="command" class="card">
+    <small>NEXT ORDER</small>
+    <p id="orderText">Activate emergency signal priority.</p>
+    <button id="order">ACTIVATE EMERGENCY SIGNAL</button>
+  </div>
 </div>
 
-<div id="overlay"><div class="panel card">
-<small>LEVEL 01 · CIVIC SQUARE</small>
-<h2>FIRST FAILURE</h2>
-<p>The traffic AI has frozen a school bus in the emergency lane. Move traffic, clear the obstruction, and get the ambulance through.</p>
-<p>Cars move and avoid each other. Sound begins after Start.</p>
-<button class="start" id="start">BEGIN SHIFT</button>
-</div></div>
+<div id="overlay">
+  <div class="panel card">
+    <small>MISSION 1 · HARBOR JUNCTION</small>
+    <h2>KEEP THE AMBULANCE MOVING</h2>
+    <p>A school bus has broken down in Harbor Junction's emergency lane. An ambulance carrying a critical patient is approaching the intersection.</p>
+    <p>You are the City Ranger. Give orders, clear the route, and get the ambulance through before time runs out.</p>
+    <p><small>Click the yellow command button or press SPACE.</small></p>
+    <button class="start" id="start">BEGIN RESPONSE</button>
+  </div>
+</div>
 
 <script>
-const C=document.querySelector("#game"),g=C.getContext("2d"),$=q=>document.querySelector(q);
-let W,H,run=false,role="dispatch",health=82,t=0,priority=false,green=false,detour=false,busClear=false,won=false,toastTimer,audio,sirenTimer;
-const lanes={east:{y:0,dir:1},west:{y:0,dir:-1}},cars=[];
+const canvas=document.querySelector("#game"),ctx=canvas.getContext("2d"),$=s=>document.querySelector(s);
+let W,H,running=false,won=false,stage=0,condition=100,remaining=90,last=0,audio=null,toastTimeout;
+let bus,tow,ambulance,traffic=[],signalGreen=false;
 
 function resize(){
-  W=C.width=innerWidth;H=C.height=innerHeight;
-  lanes.east.y=H*.50;lanes.west.y=H*.68;
+  W=canvas.width=innerWidth; H=canvas.height=innerHeight;
 }
 addEventListener("resize",resize);resize();
 
-function tone(f,d=.12,type="sine",v=.04){
+function sound(freq,duration=.12,type="sine",volume=.045){
   if(!audio)return;
-  let o=audio.createOscillator(),a=audio.createGain();
-  o.type=type;o.frequency.value=f;a.gain.value=v;
-  o.connect(a).connect(audio.destination);
-  o.start();a.gain.exponentialRampToValueAtTime(.001,audio.currentTime+d);o.stop(audio.currentTime+d);
+  const o=audio.createOscillator(),gain=audio.createGain();
+  o.type=type;o.frequency.value=freq;gain.gain.value=volume;
+  o.connect(gain).connect(audio.destination);o.start();
+  gain.gain.exponentialRampToValueAtTime(.001,audio.currentTime+duration);
+  o.stop(audio.currentTime+duration);
 }
-function startAudio(){
+function message(text){
+  $("#toast").textContent=text;clearTimeout(toastTimeout);
+  toastTimeout=setTimeout(()=>$("#toast").textContent="",2300);
+}
+function car(lane,x,color,name="",speed=.8,w=43){
+  return {lane,x,color,name,speed,v:speed,w,h:24};
+}
+function resetWorld(){
+  const east=H*.50,west=H*.68;
+  bus=car("east",W*.53-30,"#f1b842","SCHOOL BUS",0,67);
+  ambulance=car("east",-80,"#e95d56","AMBULANCE",1.12,58);
+  tow=car("east",-170,"#55c4de","TOW",.75,50);
+  traffic=[
+    car("east",W*.06,"#4d9fe6","",.78),car("east",W*.23,"#d780d9","",.70),
+    car("east",W*.38,"#f2b847","",.75),car("west",W*.91,"#f4f3ee","",.78),
+    car("west",W*.72,"#65c8ba","",.70),car("west",W*.46,"#8c79d5","",.74),
+    car("west",W*.19,"#e67d8b","",.68)
+  ];
+}
+function startGame(){
   audio=new(window.AudioContext||window.webkitAudioContext)();
-  tone(523,.15,"triangle",.05);
+  sound(520,.15,"triangle");running=true;resetWorld();
+  $("#overlay").classList.add("hide");
+  message("Emergency received. Set priority for the ambulance.");
 }
-function siren(){
-  if(!priority||won)return;
-  tone(760,.18,"square",.025);
-  setTimeout(()=>tone(1040,.18,"square",.025),190);
-}
-function notice(s){
-  $("#toast").textContent=s;
-  clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>$("#toast").textContent="",2400);
-}
-function addCar(lane,x,color,speed=.7,name=""){
-  cars.push({lane,x,color,speed,v:speed,name,alive:true,w:name==="BUS"?58:42});
-}
-function setup(){
-  cars.length=0;
-  addCar("east",W*.10,"#4da4e8",.75);
-  addCar("east",W*.27,"#f2bd51",.72);
-  addCar("east",W*.50-55,"#f0b642",0,"BUS");
-  addCar("east",-80,"#ee6c5b",1.25,"EMS");
-  addCar("west",W*.88,"#f1f3ef",.76);
-  addCar("west",W*.68,"#64bfca",.68);
-  addCar("west",W*.37,"#9b78d8",.7);
-  addCar("west",W*.08,"#e57787",.65);
-}
-function setRole(r){
-  role=r;
-  document.querySelectorAll(".role").forEach(b=>b.classList.toggle("active",b.dataset.r===r));
-  let m={
-    dispatch:["AUTHORIZE PRIORITY","Authorize hospital priority so the ambulance may claim the lane."],
-    signal:["SET EMERGENCY GREEN","Give the ambulance a green signal."],
-    route:["OPEN DETOUR","Route ordinary traffic around Civic Square."],
-    field:["CLEAR BUS","Send field crew to repair and tow the school bus."]
-  }[r];
-  $("#action").textContent=m[0];$("#hint").textContent=m[1];
-}
-document.querySelectorAll(".role").forEach(b=>b.onclick=()=>setRole(b.dataset.r));
-addEventListener("keydown",e=>{
-  if("1234".includes(e.key))setRole(["dispatch","signal","route","field"][+e.key-1]);
-  if(e.code==="Space"){e.preventDefault();act();}
-});
-$("#action").onclick=act;
-$("#start").onclick=()=>{
-  run=true;$("#overlay").classList.add("hide");
-  startAudio();setup();
-  notice("Incident active. Dispatcher: authorize hospital priority.");
-};
+$("#start").onclick=startGame;
+$("#order").onclick=issueOrder;
+addEventListener("keydown",e=>{if(e.code==="Space"){e.preventDefault();issueOrder();}});
 
-function act(){
-  if(!run||won)return;
-  if(role==="dispatch"){
-    if(priority)return notice("Priority is already active.");
-    priority=true;tone(660,.12,"triangle",.06);
-    sirenTimer=setInterval(siren,850);
-    $("#objective").textContent="Priority is active. Give the ambulance a green signal.";
-    notice("HOSPITAL PRIORITY AUTHORIZED");
-  }else if(role==="signal"){
-    if(!priority)return notice("Authorize priority first.");
-    green=true;tone(840,.15,"sine",.05);
-    $("#objective").textContent="Signal is green. Open the detour for regular traffic.";
-    notice("EMERGENCY SIGNAL GREEN");
-  }else if(role==="route"){
-    if(!green)return notice("The ambulance needs its green signal first.");
-    detour=true;tone(510,.13,"triangle",.05);
-    $("#objective").textContent="Traffic is diverting. Field crew can reach the school bus.";
-    notice("DETOUR OPEN — CIVILIANS REROUTED");
-  }else{
-    if(!detour)return notice("Open the detour before sending the field crew.");
-    busClear=true;tone(740,.1,"triangle",.05);
-    setTimeout(()=>tone(980,.16,"triangle",.05),110);
-    $("#objective").textContent="Bus cleared. Keep the route stable until EMS exits.";
-    notice("BUS REPAIRED — AMBULANCE MOVING");
+function setOrder(label,description,button){
+  $("#orderText").textContent=description;$("#order").textContent=button;
+  $("#objective").textContent=label;
+}
+function issueOrder(){
+  if(!running||won)return;
+
+  if(stage===0){
+    stage=1;signalGreen=true;sound(780,.18,"triangle");
+    setOrder(
+      "Emergency priority is active. Regular traffic is stopping at Harbor Junction.",
+      "Dispatch a tow truck to remove the school bus.",
+      "DISPATCH TOW TRUCK"
+    );
+    message("EMERGENCY SIGNAL ACTIVATED");
+  }else if(stage===1){
+    stage=2;tow.v=.90;sound(620,.15,"square");
+    setOrder(
+      "Tow truck dispatched. Keep the emergency lane protected while it reaches the bus.",
+      "Confirm the recovery crew may clear the school bus.",
+      "CLEAR SCHOOL BUS"
+    );
+    message("TOW TRUCK DISPATCHED");
+  }else if(stage===2){
+    if(tow.x<bus.x-85)return message("The tow truck has not reached the bus yet.");
+    stage=3;bus.speed=.95;bus.v=.95;sound(860,.15,"triangle");
+    setOrder(
+      "The school bus is moving out of the emergency lane. The ambulance can proceed.",
+      "Maintain the emergency corridor until the ambulance exits.",
+      "HOLD EMERGENCY CORRIDOR"
+    );
+    message("BUS CLEARED — AMBULANCE RELEASED");
+  }else if(stage===3){
+    stage=4;sound(930,.14,"sine");
+    message("CORRIDOR CONFIRMED");
+    $("#order").disabled=true;$("#order").textContent="EMERGENCY CORRIDOR ACTIVE";
   }
 }
 
-function update(dt){
-  if(!run||won)return;
-  t+=dt;
-  let es=cars.filter(a=>a.lane==="east"&&a.alive).sort((a,b)=>b.x-a.x);
-  let ws=cars.filter(a=>a.lane==="west"&&a.alive).sort((a,b)=>a.x-b.x);
+function moveVehicle(v,dt,leader){
+  let target=v.speed;
+  if(v===bus&&stage<3)target=0;
+  if(v===ambulance&&stage<3)target=0;
+  if(v===tow&&stage<2)target=0;
 
-  for(let group of [es,ws]){
-    for(let i=0;i<group.length;i++){
-      let a=group[i],ahead=group[i-1],desired=a.speed;
-      if(a.name==="BUS")desired=busClear?1:0;
-      if(a.name==="EMS"&&!busClear)desired=0;
-      if(a.lane==="east"&&!detour&&a.name!=="EMS"&&a.x>W*.42&&a.x<W*.5-100)desired=0;
-      if(ahead){
-        let gap=a.lane==="east"?ahead.x-a.x:a.x-ahead.x;
-        if(gap<72)desired=Math.min(desired,Math.max(0,(gap-38)*.025));
-      }
-      a.v+=(desired-a.v)*Math.min(1,dt*3);
-      a.x+=a.v*60*dt*(a.lane==="east"?1:-1);
-      if(a.name!=="BUS"&&((a.lane==="east"&&a.x>W+90)||(a.lane==="west"&&a.x<-90))){
-        a.x=a.lane==="east"?-70:W+70;
-      }
+  if(v.lane==="east"){
+    if(!signalGreen&&v!==ambulance&&v.x>W*.42&&v.x<W*.49)target=0;
+    if(leader){
+      let gap=leader.x-v.x;
+      if(gap<72)target=Math.min(target,Math.max(0,(gap-38)*.025));
     }
+    v.v+=(target-v.v)*Math.min(1,dt*3);
+    v.x+=v.v*60*dt;
+    if(v!==bus&&v.x>W+100)v.x=-90;
+  }else{
+    if(leader){
+      let gap=v.x-leader.x;
+      if(gap<72)target=Math.min(target,Math.max(0,(gap-38)*.025));
+    }
+    v.v+=(target-v.v)*Math.min(1,dt*3);
+    v.x-=v.v*60*dt;
+    if(v.x<-100)v.x=W+90;
   }
+}
+function update(dt){
+  if(!running||won)return;
+  remaining=Math.max(0,remaining-dt);
+  condition=Math.max(0,condition-dt*(stage>=3?.04:.40));
+  $("#condition").textContent=Math.ceil(condition);
+  $("#conditionBar").style.width=condition+"%";
+  $("#timeBar").style.width=(remaining/90*100)+"%";
+  let secs=Math.ceil(remaining);
+  $("#timer").textContent="01:"+(secs<60?String(secs).padStart(2,"0"):"00");
 
-  let ems=cars.find(a=>a.name==="EMS");
-  if(busClear&&ems&&ems.x>W+30){
-    won=true;clearInterval(sirenTimer);
-    tone(880,.2,"triangle",.06);
-    setTimeout(()=>tone(1170,.35,"triangle",.06),180);
+  let east=[...traffic.filter(v=>v.lane==="east"),bus,tow,ambulance].sort((a,b)=>b.x-a.x);
+  let west=traffic.filter(v=>v.lane==="west").sort((a,b)=>a.x-b.x);
+  east.forEach((v,i)=>moveVehicle(v,dt,east[i-1]));
+  west.forEach((v,i)=>moveVehicle(v,dt,west[i-1]));
+
+  if(stage===3&&ambulance.x>W+35){
+    won=true;sound(880,.18,"triangle");setTimeout(()=>sound(1175,.35,"triangle"),180);
     $("#overlay").classList.remove("hide");
-    $("#overlay .panel").innerHTML="<small>SHIFT REPORT</small><h2>CIVIC SQUARE SAVED</h2><p>The ambulance cleared Civic Square. Moving traffic, lane spacing, and sound are active.</p><button class='start' onclick='location.reload()'>RUN AGAIN</button>";
+    $("#overlay .panel").innerHTML=`
+      <small>MISSION COMPLETE</small>
+      <h2>PATIENT DELIVERED SAFELY</h2>
+      <p>You cleared Harbor Junction and preserved the medical route.</p>
+      <p><b>City condition: ${Math.ceil(condition)}%</b></p>
+      <button class="start" onclick="location.reload()">PLAY AGAIN</button>`;
   }
-
-  health=Math.max(0,health-dt*(busClear?0:.35));
-  $("#hp").textContent=Math.ceil(health);
-  $("#fill").style.width=health+"%";
-  let s=Math.floor(t),m=8+Math.floor(s/60);
-  $("#clock").textContent=m+":"+(s%60+"").padStart(2,"0");
+  if(remaining<=0||condition<=0){
+    won=true;
+    $("#overlay").classList.remove("hide");
+    $("#overlay .panel").innerHTML=`
+      <small>MISSION FAILED</small>
+      <h2>THE ROUTE CLOSED</h2>
+      <p>The emergency response took too long. Try a faster response.</p>
+      <button class="start" onclick="location.reload()">TRY AGAIN</button>`;
+  }
 }
 
-function box(x,y,w,h,c){
-  g.fillStyle="#111b26";g.fillRect(x-3,y+5,w+6,h);
-  g.fillStyle=c;g.fillRect(x,y,w,h);
-  g.fillStyle="#c6edf3";
-  g.fillRect(x+6,y+3,w*.28,7);g.fillRect(x+w*.62,y+3,w*.22,7);
-  g.fillStyle="#08131e";
-  g.fillRect(x+5,y+h-2,9,5);g.fillRect(x+w-14,y+h-2,9,5);
-}
-function pip(x,y,c,l){
-  g.fillStyle="#eadfae";g.beginPath();g.roundRect(x-12,y-22,24,22,8);g.fill();
-  g.fillStyle="#152031";g.fillRect(x-6,y-12,3,3);g.fillRect(x+4,y-12,3,3);
-  g.fillStyle=c;g.beginPath();g.roundRect(x-14,y-1,28,30,8);g.fill();
-  g.fillStyle="#1b2637";g.fillRect(x-11,y+27,8,7);g.fillRect(x+3,y+27,8,7);
-  g.fillStyle="#fff";g.font="11px Arial";g.fillText(l,x-4,y+18);
+function drawVehicle(v,y){
+  ctx.fillStyle="#111a24";ctx.fillRect(v.x-3,y-7,v.w+6,v.h+5);
+  ctx.fillStyle=v.color;ctx.fillRect(v.x,y-10,v.w,v.h);
+  ctx.fillStyle="#ccecf4";ctx.fillRect(v.x+6,y-7,v.w*.28,7);ctx.fillRect(v.x+v.w*.62,y-7,v.w*.22,7);
+  ctx.fillStyle="#091522";ctx.fillRect(v.x+5,y+12,9,5);ctx.fillRect(v.x+v.w-14,y+12,9,5);
+  if(v.name){ctx.fillStyle="#fff";ctx.font="bold 9px Arial";ctx.fillText(v.name,v.x+5,y+5);}
 }
 function draw(){
-  g.clearRect(0,0,W,H);
-  g.fillStyle="#83c985";g.fillRect(0,0,W,H);
-  g.fillStyle="#73b9d2";g.fillRect(0,H*.2,W,H*.62);
+  const east=H*.50,west=H*.68,cx=W*.52;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle="#86ca87";ctx.fillRect(0,0,W,H);
+  ctx.fillStyle="#72b9d1";ctx.fillRect(0,H*.2,W,H*.62);
 
-  for(let y of [lanes.east.y,lanes.west.y]){
-    g.fillStyle="#2b4152";g.fillRect(0,y-55,W,110);
-    g.strokeStyle="#e2c875";g.lineWidth=3;g.setLineDash([20,18]);
-    g.beginPath();g.moveTo(0,y);g.lineTo(W,y);g.stroke();g.setLineDash([]);
+  for(const y of [east,west]){
+    ctx.fillStyle="#2a4052";ctx.fillRect(0,y-54,W,108);
+    ctx.strokeStyle="#e2c875";ctx.lineWidth=3;ctx.setLineDash([20,18]);
+    ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();ctx.setLineDash([]);
   }
 
-  g.fillStyle="#52785f";g.fillRect(W*.46,H*.2,W*.09,H*.62);
-  g.fillStyle="#7eaf7e";g.fillRect(W*.472,H*.22,W*.066,H*.58);
+  ctx.fillStyle="#547861";ctx.fillRect(cx-65,H*.2,130,H*.62);
+  ctx.fillStyle="#7fad7d";ctx.fillRect(cx-47,H*.22,94,H*.58);
+  ctx.fillStyle="#c8ded1";ctx.beginPath();ctx.arc(cx,H*.59,80,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#75949e";ctx.beginPath();ctx.arc(cx,H*.59,63,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#9cdfeb";ctx.beginPath();ctx.arc(cx,H*.59,39,0,Math.PI*2);ctx.fill();
 
-  g.fillStyle="#c7d9d0";g.beginPath();g.arc(W*.505,H*.59,84,0,7);g.fill();
-  g.fillStyle="#71909a";g.beginPath();g.arc(W*.505,H*.59,67,0,7);g.fill();
-  g.fillStyle="#9bdded";g.beginPath();g.arc(W*.505,H*.59,42,0,7);g.fill();
+  traffic.forEach(v=>drawVehicle(v,v.lane==="east"?east:west));
+  drawVehicle(bus,east);drawVehicle(tow,east);drawVehicle(ambulance,east);
 
-  for(let a of cars){
-    if(!a.alive)continue;
-    box(a.x,lanes[a.lane].y-15,a.w,24,a.color);
-    if(a.name){
-      g.fillStyle="#fff";g.font="bold 10px Arial";
-      g.fillText(a.name,a.x+5,lanes[a.lane].y+1);
-    }
-  }
-
-  pip(W*.34,H*.31,"#55b8e8","D");
-  pip(W*.67,H*.31,"#68d8c7","S");
-  pip(W*.33,H*.78,"#efb955","R");
-  pip(W*.67,H*.78,"#ed7666","F");
-
-  g.fillStyle=priority?"#ffdf60":"#5d6873";
-  g.beginPath();g.arc(W*.62,lanes.east.y-45,26,0,7);g.fill();
+  ctx.fillStyle=signalGreen?"#59e3a0":"#ea5d56";
+  ctx.beginPath();ctx.arc(cx+105,east-46,18,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#132434";ctx.font="bold 10px Arial";
+  ctx.fillText(signalGreen?"GREEN":"STOP",cx+89,east-42);
 
   requestAnimationFrame(loop);
 }
-let last=performance.now();
-function loop(n){
-  update(Math.min(.05,(n-last)/1000));
-  last=n;draw();
+function loop(now){
+  let dt=Math.min(.05,(now-last)/1000||0);last=now;
+  update(dt);draw();
 }
-loop(last);
+requestAnimationFrame(loop);
 </script>
 </body>
 </html>
