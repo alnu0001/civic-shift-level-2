@@ -1,274 +1,69 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>City Ranger — Harbor Avenue</title>
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>City Ranger</title>
 <style>
-*{box-sizing:border-box}body{margin:0;overflow:hidden;background:#06111d;color:#eef9ff;font-family:Arial,sans-serif}canvas{display:block}
-#ui{position:fixed;inset:0;pointer-events:none}.card{background:#092039eb;border:1px solid #4c7996;border-radius:13px;box-shadow:0 10px 28px #0008}
-#brand,#status,#mission,#tools,#overlay{pointer-events:auto}#brand{position:absolute;top:18px;left:22px}small{display:block;font-size:10px;letter-spacing:2px;color:#a8c9df}h1{margin:3px 0;font-size:29px}h1 i{color:#ffcc58}
-#status{position:absolute;right:20px;top:18px;width:225px;padding:13px}.bar{height:9px;border-radius:8px;overflow:hidden;background:#183750;margin:5px 0 10px}.bar b{display:block;height:100%;width:100%;background:#58dda1}
-#mission{position:absolute;left:20px;top:110px;width:300px;padding:14px;font-size:14px;line-height:1.4}#mission p{margin:7px 0;color:#d2e3ee}
-#tools{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);width:min(760px,94vw);padding:11px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
-button{font:inherit;font-weight:bold;cursor:pointer}.tool{background:#12304c;color:#edf9ff;border:1px solid #4d7692;border-radius:10px;padding:10px 12px}.tool:hover:not(:disabled){background:#216278}.tool:disabled{opacity:.42;cursor:not-allowed}.tool.active{background:#ffc653;color:#142638;border:0}
-#toast{position:absolute;top:51%;left:50%;transform:translate(-50%,-50%);font-size:18px;font-weight:bold;text-shadow:0 2px 4px #000;text-align:center;width:90%}
-#overlay{position:fixed;inset:0;background:#06111eeb;display:flex;justify-content:center;align-items:center}.brief{max-width:550px;padding:31px;text-align:center;margin:20px}.brief h2{font-size:36px;margin:8px 0}.brief p{line-height:1.55;color:#cbdde9}.start{border:0;border-radius:10px;background:#62ddca;color:#062033;padding:14px 26px;font-size:16px}.hide{display:none!important}
-</style>
-</head>
-<body>
-<canvas id="game"></canvas>
-
+*{box-sizing:border-box}body{margin:0;overflow:hidden;background:#07131f;color:#eef;font-family:Arial}canvas{display:block}
+#ui{position:fixed;inset:0;pointer-events:none}.box{background:#092039e9;border:1px solid #4e7994;border-radius:12px;padding:12px;box-shadow:0 8px 24px #0008}
+#title,#mission,#tools,#startScreen{pointer-events:auto}#title{position:absolute;top:16px;left:20px}small{display:block;color:#9ec5dc;letter-spacing:2px;font-size:10px}h1{margin:3px 0;font-size:28px}i{color:#ffca55}
+#mission{position:absolute;top:100px;left:20px;width:290px;font-size:14px;line-height:1.4}#mission p{margin:6px 0;color:#cde0ec}
+#tools{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:7px;flex-wrap:wrap;justify-content:center;width:min(760px,94vw)}
+button{font:inherit;font-weight:bold;cursor:pointer;border:0;border-radius:9px;padding:11px;background:#163653;color:#eef}.tool:hover:not(:disabled){background:#28677b}.tool:disabled{opacity:.35}.on{background:#ffca55!important;color:#162536}#msg{position:absolute;top:52%;left:50%;transform:translate(-50%,-50%);font-size:18px;font-weight:bold;text-shadow:0 2px 4px #000;text-align:center}
+#startScreen{position:fixed;inset:0;background:#06111eed;display:flex;align-items:center;justify-content:center}.brief{max-width:540px;text-align:center;padding:30px;margin:20px}.brief h2{font-size:35px;margin:8px}.brief p{line-height:1.55;color:#cbddea}.start{background:#62ddca;color:#062033;font-size:16px;padding:14px 25px}.hide{display:none!important}
+</style></head><body><canvas id="c"></canvas>
 <div id="ui">
-  <div id="brand"><small>CITY EMERGENCY RESPONSE</small><h1>CITY <i>RANGER</i></h1></div>
-
-  <div id="status" class="card">
-    <small>CITY CONDITION <span id="health">100</span>%</small>
-    <div class="bar"><b id="healthBar"></b></div>
-    <small>MEDICAL WINDOW <span id="clock">01:30</span></small>
-    <div class="bar"><b id="timeBar" style="background:#ffc653"></b></div>
-  </div>
-
-  <div id="mission" class="card">
-    <small>● MISSION 1 · HARBOR AVENUE</small>
-    <p id="objective">A school bus has broken down in Harbor Avenue's emergency route.</p>
-    <p id="help">Activate emergency priority before the ambulance reaches the bus.</p>
-  </div>
-
-  <div id="toast"></div>
-
-  <div id="tools" class="card">
-    <button class="tool" id="priority">1 · EMERGENCY PRIORITY</button>
-    <button class="tool" id="cones" disabled>2 · CLOSE LANE</button>
-    <button class="tool" id="tow" disabled>3 · DISPATCH TOW CREW</button>
-    <button class="tool" id="clear" disabled>4 · CLEAR SCHOOL BUS</button>
-  </div>
-</div>
-
-<div id="overlay">
-  <div class="brief card">
-    <small>MISSION 1 · HARBOR AVENUE</small>
-    <h2>KEEP THE AMBULANCE MOVING</h2>
-    <p>A school bus has broken down in Harbor Avenue's emergency route. An ambulance carrying a critical patient is approaching.</p>
-    <p>You are the City Ranger. Control traffic, close the route, dispatch the tow crew, and protect the ambulance corridor.</p>
-    <button id="start" class="start">BEGIN RESPONSE</button>
-  </div>
-</div>
-
+<div id="title"><small>CITY EMERGENCY RESPONSE</small><h1>CITY <i>RANGER</i></h1></div>
+<div id="mission" class="box"><small>MISSION 1 · HARBOR AVENUE</small><p id="obj">A school bus has broken down in the emergency lane.</p><p id="hint">Block cross traffic before the ambulance arrives.</p></div>
+<div id="msg"></div>
+<div id="tools" class="box">
+<button id="police" class="tool">1 · BLOCK CROSS STREET</button>
+<button id="cones" class="tool" disabled>2 · CLOSE EMERGENCY LANE</button>
+<button id="tow" class="tool" disabled>3 · DISPATCH TOW TRUCK</button>
+<button id="pull" class="tool" disabled>4 · TOW BUS AWAY</button>
+</div></div>
+<div id="startScreen"><div class="brief box"><small>MISSION 1 · HARBOR AVENUE</small><h2>KEEP THE AMBULANCE MOVING</h2><p>A broken school bus blocks an ambulance carrying a critical patient. Stop cross traffic, protect the emergency lane, and tow the bus safely onto the side street.</p><button id="start" class="start">BEGIN RESPONSE</button></div></div>
 <script>
-const C=document.querySelector("#game"),X=C.getContext("2d"),$=s=>document.querySelector(s);
-let W,H,running=false,finished=false,step=0,health=100,time=90,last=0,audio,sirenId,toastId;
-let bus,ambulance,tow,carsE=[],carsW=[],officer=false,cones=false,crew=false,rain=[];
-
-function resize(){W=C.width=innerWidth;H=C.height=innerHeight}
-addEventListener("resize",()=>{resize();setup()});
-resize();
-
+const C=document.querySelector("#c"),x=C.getContext("2d"),$=s=>document.querySelector(s);
+let W,H,run=false,step=0,last=0,audio,siren,bus,tow,ambulance,cars=[],cross=[],police=false,cone=false,msgTimer;
+function size(){W=C.width=innerWidth;H=C.height=innerHeight}addEventListener("resize",size);size();
 function setup(){
-  const east=H*.49,west=H*.68;
-  bus={x:W*.62,y:east-12,w:76,off:0,clear:false};
-  ambulance={x:-110,y:east-12,w:68,v:0};
-  tow={x:-100,y:H*.80,w:62,v:0};
-  carsE=[
-    {x:W*.03,y:east-12,w:44,s:.70,v:.70,c:"#5aa8ea"},
-    {x:W*.17,y:east-12,w:44,s:.66,v:.66,c:"#d77dc5"},
-    {x:W*.31,y:east-12,w:44,s:.73,v:.73,c:"#f1b842"},
-    {x:W*.79,y:east-12,w:44,s:.68,v:.68,c:"#8581df"},
-    {x:W*.93,y:east-12,w:44,s:.72,v:.72,c:"#56c2b8"}
-  ];
-  carsW=[
-    {x:W*.96,y:west-12,w:44,s:.71,v:.71,c:"#ea7e8c"},
-    {x:W*.80,y:west-12,w:44,s:.67,v:.67,c:"#f3f3ed"},
-    {x:W*.64,y:west-12,w:44,s:.74,v:.74,c:"#68c4d8"},
-    {x:W*.48,y:west-12,w:44,s:.69,v:.69,c:"#a17fde"},
-    {x:W*.31,y:west-12,w:44,s:.66,v:.66,c:"#e8a15e"}
-  ];
-  rain=Array.from({length:70},()=>({x:Math.random()*W,y:Math.random()*H,s:4+Math.random()*5}));
+ let y=H*.57;
+ bus={x:W*.53,y,w:72,turn:0};tow={x:-90,y,w:58,go:false};ambulance={x:-170,y,w:64,v:0};
+ cars=[{x:W*.05,v:.68,c:"#58a8e9"},{x:W*.18,v:.72,c:"#e38ac6"},{x:W*.31,v:.66,c:"#f1b844"}];
+ cross=[{y:H*.17,v:.62,c:"#f4f4ed"},{y:H*.02,v:.72,c:"#75c8d7"},{y:H*.84,v:-.66,c:"#df7e87"}];
 }
 setup();
-
-function tone(f,d=.14,type="sine",vol=.04){
-  if(!audio)return;
-  const o=audio.createOscillator(),g=audio.createGain();
-  o.type=type;o.frequency.value=f;g.gain.value=vol;
-  o.connect(g).connect(audio.destination);o.start();
-  g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+d);o.stop(audio.currentTime+d);
-}
-function breakdown(){
-  tone(95,.23,"sawtooth",.07);
-  setTimeout(()=>tone(62,.28,"square",.055),160);
-  setTimeout(()=>tone(130,.12,"square",.04),430);
-}
-function siren(){
-  if(step<1||finished)return;
-  tone(720,.18,"square",.022);
-  setTimeout(()=>tone(1060,.18,"square",.022),190);
-}
-function say(t){
-  $("#toast").textContent=t;clearTimeout(toastId);
-  toastId=setTimeout(()=>$("#toast").textContent="",2400);
-}
-function text(a,b){$("#objective").textContent=a;$("#help").textContent=b}
-function unlock(id){$(id).disabled=false;$(id).classList.add("active")}
-function lock(id){$(id).disabled=true;$(id).classList.remove("active")}
-
-$("#start").onclick=()=>{
-  audio=new(window.AudioContext||window.webkitAudioContext)();
-  running=true;$("#overlay").classList.add("hide");
-  setTimeout(breakdown,300);
-  say("BUS BREAKDOWN REPORTED — AMBULANCE INBOUND");
-};
-
-$("#priority").onclick=()=>{
-  if(!running||step!==0)return;
-  step=1;officer=true;lock("#priority");unlock("#cones");
-  tone(780,.16,"triangle");sirenId=setInterval(siren,790);
-  text("Emergency priority is active. Traffic police are stopping civilian vehicles.","Close Harbor Avenue's emergency lane with traffic cones.");
-  say("EMERGENCY PRIORITY ACTIVATED");
-};
-$("#cones").onclick=()=>{
-  if(step!==1)return;
-  step=2;cones=true;lock("#cones");unlock("#tow");tone(560,.14,"triangle");
-  text("Traffic cones now protect the ambulance route.","Dispatch the tow crew to remove the broken school bus.");
-  say("EMERGENCY LANE CLOSED");
-};
-$("#tow").onclick=()=>{
-  if(step!==2)return;
-  step=3;crew=true;tow.v=.92;lock("#tow");tone(620,.14,"square");
-  text("Tow truck and road crew are approaching the bus.","Wait for the crew to reach the school bus.");
-  say("TOW CREW DISPATCHED");
-};
-$("#clear").onclick=()=>{
-  if(step!==4)return;
-  step=5;bus.clear=true;lock("#clear");tone(850,.16,"triangle");
-  text("The school bus is leaving the emergency route. The ambulance has a clear corridor.","Hold the route until the ambulance exits Harbor Avenue.");
-  say("SCHOOL BUS CLEARED — AMBULANCE RELEASED");
-};
-addEventListener("keydown",e=>{
-  if(e.key==="1")$("#priority").click();
-  if(e.key==="2")$("#cones").click();
-  if(e.key==="3")$("#tow").click();
-  if(e.key==="4")$("#clear").click();
-});
-
-function moveEast(list,stop,dt){
-  const ordered=[...list].sort((a,b)=>b.x-a.x);
-  ordered.forEach((car,i)=>{
-    let target=car.s,lead=ordered[i-1];
-    if(stop&&car.x>stop-180&&car.x<stop)target=0;
-    if(lead){
-      const gap=lead.x-car.x-lead.w;
-      if(gap<43)target=Math.min(target,Math.max(0,gap*.03));
-    }
-    car.v+=(target-car.v)*Math.min(1,dt*4);
-    car.x+=car.v*60*dt;
-    if(car.x>W+60)car.x=-60;
-  });
-}
-function moveWest(list,dt){
-  const ordered=[...list].sort((a,b)=>a.x-b.x);
-  ordered.forEach((car,i)=>{
-    let target=car.s,lead=ordered[i-1];
-    if(lead){
-      const gap=car.x-lead.x-lead.w;
-      if(gap<43)target=Math.min(target,Math.max(0,gap*.03));
-    }
-    car.v+=(target-car.v)*Math.min(1,dt*4);
-    car.x-=car.v*60*dt;
-    if(car.x<-60)car.x=W+60;
-  });
-}
-
+function sound(f,d=.14,t="sine",v=.04){if(!audio)return;let o=audio.createOscillator(),g=audio.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;o.connect(g).connect(audio.destination);o.start();g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+d);o.stop(audio.currentTime+d)}
+function say(s){$("#msg").textContent=s;clearTimeout(msgTimer);msgTimer=setTimeout(()=>$("#msg").textContent="",2200)}
+function sirenSound(){if(step<1)return;sound(720,.18,"square",.02);setTimeout(()=>sound(1060,.18,"square",.02),190)}
+function setText(a,b){$("#obj").textContent=a;$("#hint").textContent=b}
+function unlock(id){$(id).disabled=false;$(id).classList.add("on")}function lock(id){$(id).disabled=true;$(id).classList.remove("on")}
+$("#start").onclick=()=>{audio=new(window.AudioContext||window.webkitAudioContext)();run=true;$("#startScreen").classList.add("hide");sound(95,.25,"sawtooth",.07);setTimeout(()=>sound(62,.28,"square",.05),150);say("SCHOOL BUS BREAKDOWN REPORTED")};
+$("#police").onclick=()=>{if(!run||step)return;step=1;police=true;lock("#police");unlock("#cones");siren=setInterval(sirenSound,790);sound(780,.15,"triangle");setText("Traffic police are stopping vehicles on the cross street.","Close the emergency lane with cones.");say("CROSS STREET BLOCKED")};
+$("#cones").onclick=()=>{if(step!==1)return;step=2;cone=true;lock("#cones");unlock("#tow");sound(570,.14,"triangle");setText("Cones protect the ambulance corridor.","Dispatch the tow truck to the school bus.");say("EMERGENCY LANE CLOSED")};
+$("#tow").onclick=()=>{if(step!==2)return;step=3;tow.go=true;lock("#tow");sound(620,.14,"square");setText("Tow truck is driving along Harbor Avenue.","Wait for it to connect to the school bus.");say("TOW TRUCK EN ROUTE")};
+$("#pull").onclick=()=>{if(step!==4)return;step=5;lock("#pull");sound(850,.16,"triangle");setText("Tow truck is pulling the bus forward and turning onto the side street.","Keep the emergency corridor open for the ambulance.");say("BUS IS BEING TOWED AWAY")};
+addEventListener("keydown",e=>{if(e.key==="1")$("#police").click();if(e.key==="2")$("#cones").click();if(e.key==="3")$("#tow").click();if(e.key==="4")$("#pull").click()});
 function update(dt){
-  if(!running||finished)return;
-  time=Math.max(0,time-dt);
-  health=Math.max(0,health-dt*(step>=5?.05:.38));
-  $("#health").textContent=Math.ceil(health);
-  $("#healthBar").style.width=health+"%";
-  $("#timeBar").style.width=(time/90*100)+"%";
-  $("#clock").textContent="01:"+String(Math.min(59,Math.ceil(time))).padStart(2,"0");
-
-  moveEast(carsE,step>=1?W*.48:0,dt);
-  moveWest(carsW,dt);
-
-  if(step>=1&&!bus.clear){
-    ambulance.v=.58;
-    ambulance.x=Math.min(bus.x-108,ambulance.x+ambulance.v*60*dt);
-  }
-  if(step===3&&tow.x<bus.x-84)tow.x+=tow.v*60*dt;
-  if(step===3&&tow.x>=bus.x-84){
-    step=4;unlock("#clear");tone(720,.12,"triangle");
-    text("The tow crew has reached the school bus.","Authorize the road crew to pull the bus out of Harbor Avenue.");
-    say("TOW CREW READY FOR CLEARANCE");
-  }
-  if(bus.clear){
-    bus.off=Math.min(145,bus.off+55*dt);
-    ambulance.v=1.17;ambulance.x+=ambulance.v*60*dt;
-  }
-  rain.forEach(r=>{r.y+=r.s;if(r.y>H){r.y=-8;r.x=Math.random()*W}});
-
-  if(ambulance.x>W+75){
-    finished=true;clearInterval(sirenId);
-    tone(900,.16,"triangle");setTimeout(()=>tone(1180,.35,"triangle"),180);
-    $("#overlay").classList.remove("hide");
-    $(".brief").innerHTML="<small>MISSION COMPLETE</small><h2>PATIENT DELIVERED SAFELY</h2><p>The ambulance crossed Harbor Avenue through the protected emergency corridor.</p><p><b>City condition: "+Math.ceil(health)+"%</b></p><button class='start' onclick='location.reload()'>PLAY AGAIN</button>";
-  }
+ if(!run)return;
+ let ordered=[...cars].sort((a,b)=>b.x-a.x);
+ ordered.forEach((a,i)=>{let target=a.v,lead=ordered[i-1];if(step>=1&&a.x>W*.39&&a.x<W*.50)target=0;if(lead&&lead.x-a.x<62)target=0;a.x+=target*60*dt;if(a.x>W+60)a.x=-60});
+ cross.forEach(a=>{let target=a.v;if(police&&((a.v>0&&a.y>H*.27&&a.y<H*.44)||(a.v<0&&a.y<H*.70&&a.y>H*.56)))target=0;a.y+=target*60*dt;if(a.y>H+70)a.y=-70;if(a.y<-70)a.y=H+70});
+ if(step===3&&tow.x<bus.x-65)tow.x+=.9*60*dt;
+ if(step===3&&tow.x>=bus.x-65){step=4;unlock("#pull");setText("Tow truck is attached to the school bus.","Authorize the tow crew to pull it through the junction and turn right.");say("TOW TRUCK CONNECTED TO BUS")}
+ if(step===5){bus.turn=Math.min(1,bus.turn+dt*.24);let t=bus.turn;bus.x=W*.53+W*.12*t;bus.y=H*.57+H*.25*t*t;tow.x=bus.x-63;tow.y=bus.y;if(t>.45){ambulance.v=1.08;ambulance.x+=ambulance.v*60*dt}}
+ if(step>=1&&step<5)ambulance.x=Math.min(bus.x-105,ambulance.x+.52*60*dt);
+ if(ambulance.x>W+70){clearInterval(siren);run=false;$("#startScreen").classList.remove("hide");$(".brief").innerHTML="<small>MISSION COMPLETE</small><h2>PATIENT DELIVERED SAFELY</h2><p>The traffic police protected the road, and the tow crew cleared Harbor Avenue.</p><button class='start' onclick='location.reload()'>PLAY AGAIN</button>"}
 }
-
-function vehicle(v,label=""){
-  X.save();X.shadowColor="#00101f";X.shadowBlur=8;X.shadowOffsetY=5;
-  X.fillStyle="#101b27";X.fillRect(v.x-3,v.y+5,v.w+6,25);
-  X.fillStyle=v.c||"#f1b83e";X.fillRect(v.x,v.y,v.w,23);X.restore();
-  X.fillStyle="#c9edf3";X.fillRect(v.x+6,v.y+3,v.w*.27,7);X.fillRect(v.x+v.w*.63,v.y+3,v.w*.19,7);
-  X.fillStyle="#07131e";X.fillRect(v.x+5,v.y+21,9,5);X.fillRect(v.x+v.w-14,v.y+21,9,5);
-  if(label){X.fillStyle="#fff";X.font="bold 9px Arial";X.fillText(label,v.x+5,v.y+16)}
-}
-function drawBus(){
-  const v={x:bus.x,y:bus.y+bus.off,w:bus.w,c:"#f1b83e"};vehicle(v,"SCHOOL BUS");
-  for(let i=0;i<4;i++){X.fillStyle="#ffdf75";X.fillRect(v.x+8+i*13,v.y+4,8,7)}
-  if(!bus.clear){X.fillStyle="#ff644c";X.beginPath();X.arc(v.x+68,v.y-5,4,0,7);X.fill()}
-}
-function drawAmbulance(){
-  const v={...ambulance,c:"#f5f7f5"};vehicle(v,"AMBULANCE");
-  X.fillStyle="#e33e49";X.fillRect(v.x+10,v.y+7,13,10);X.fillRect(v.x+14,v.y+4,4,16);X.fillRect(v.x+8,v.y+10,17,4);
-  X.fillStyle=Math.floor(performance.now()/150)%2?"#ef4556":"#55c1f2";X.fillRect(v.x+40,v.y-5,12,5);
-}
-function drawTow(){
-  if(!crew)return;const v={...tow,c:"#42bad0"};vehicle(v,"TOW");
-  X.strokeStyle="#d9f0f2";X.lineWidth=3;X.beginPath();X.moveTo(v.x+42,v.y+2);X.lineTo(v.x+58,v.y-16);X.lineTo(v.x+67,v.y+2);X.stroke();
-}
-function person(px,py,c,label){
-  X.fillStyle="#eadba8";X.beginPath();X.arc(px,py-15,10,0,7);X.fill();
-  X.fillStyle="#142334";X.fillRect(px-4,py-18,2,2);X.fillRect(px+3,py-18,2,2);
-  X.fillStyle=c;X.fillRect(px-11,py-4,22,25);X.fillStyle="#172535";X.fillRect(px-8,py+20,6,7);X.fillRect(px+3,py+20,6,7);
-  X.fillStyle="#fff";X.font="bold 9px Arial";X.fillText(label,px-17,py+39);
-}
+function car(v,y,label=""){x.fillStyle="#101a25";x.fillRect(v.x-3,y+5,v.w+6,25);x.fillStyle=v.c||"#f1b83e";x.fillRect(v.x,y,v.w,23);x.fillStyle="#c9edf3";x.fillRect(v.x+6,y+3,v.w*.25,7);x.fillRect(v.x+v.w*.63,y+3,v.w*.18,7);x.fillStyle="#07131e";x.fillRect(v.x+5,y+21,9,5);x.fillRect(v.x+v.w-14,y+21,9,5);if(label){x.fillStyle="#fff";x.font="bold 9px Arial";x.fillText(label,v.x+5,y+16)}}
+function person(px,py,c,label){x.fillStyle="#eadba8";x.beginPath();x.arc(px,py-15,10,0,7);x.fill();x.fillStyle=c;x.fillRect(px-11,py-4,22,25);x.fillStyle="#182535";x.fillRect(px-8,py+20,6,7);x.fillRect(px+3,py+20,6,7);x.fillStyle="#fff";x.font="bold 9px Arial";x.fillText(label,px-18,py+39)}
 function draw(){
-  const east=H*.49,west=H*.68,cx=W*.53;
-  const sky=X.createLinearGradient(0,0,0,H);sky.addColorStop(0,"#427b9a");sky.addColorStop(.35,"#77bed2");sky.addColorStop(1,"#86ca87");
-  X.fillStyle=sky;X.fillRect(0,0,W,H);
-  for(const y of [east,west]){
-    X.fillStyle="#293f51";X.fillRect(0,y-55,W,110);
-    X.strokeStyle="#e1c577";X.lineWidth=3;X.setLineDash([21,18]);X.beginPath();X.moveTo(0,y);X.lineTo(W,y);X.stroke();X.setLineDash([]);
-  }
-  X.fillStyle="#547560";X.fillRect(cx-67,H*.20,134,H*.58);X.fillStyle="#80ad7d";X.fillRect(cx-48,H*.22,96,H*.54);
-  X.fillStyle="#cee0d2";X.beginPath();X.arc(cx,H*.63,76,0,7);X.fill();X.fillStyle="#73939e";X.beginPath();X.arc(cx,H*.63,59,0,7);X.fill();
-
-  carsE.forEach(v=>vehicle(v));carsW.forEach(v=>vehicle(v));drawBus();drawTow();drawAmbulance();
-  if(officer)person(W*.45,east-118,"#4d9fe9","TRAFFIC POLICE");
-  if(crew)person(Math.min(tow.x+18,bus.x-50),H*.75,"#f0af44","ROAD CREW");
-  person(W*.17,H*.80,"#58d6c8","CITY RANGER");
-
-  if(cones)for(let i=0;i<7;i++){let q=W*.42+i*27;X.fillStyle="#ff8d38";X.beginPath();X.moveTo(q,east+36);X.lineTo(q+11,east+36);X.lineTo(q+5.5,east+17);X.fill()}
-  X.fillStyle=step>=1?"#58e0a0":"#ec5d56";X.beginPath();X.arc(W*.45,east-48,18,0,7);X.fill();
-  X.fillStyle="#102536";X.font="bold 9px Arial";X.fillText(step>=1?"GO":"STOP",W*.439,east-45);
-
-  X.strokeStyle="rgba(225,245,255,.35)";X.lineWidth=1;
-  rain.forEach(r=>{X.beginPath();X.moveTo(r.x,r.y);X.lineTo(r.x-2,r.y+r.s);X.stroke()});
-  requestAnimationFrame(loop);
-}
-function loop(now){const dt=Math.min(.05,(now-last)/1000||0);last=now;update(dt);draw()}
-requestAnimationFrame(loop);
-</script>
-</body>
-</html>
+ let ey=H*.57,cx=W*.53;x.clearRect(0,0,W,H);let sky=x.createLinearGradient(0,0,0,H);sky.addColorStop(0,"#467f9e");sky.addColorStop(1,"#86cb87");x.fillStyle=sky;x.fillRect(0,0,W,H);
+ x.fillStyle="#293f51";x.fillRect(0,ey-62,W,125);x.fillRect(cx-63,0,126,H);x.strokeStyle="#e0c576";x.lineWidth=3;x.setLineDash([21,18]);x.beginPath();x.moveTo(0,ey);x.lineTo(W,ey);x.moveTo(cx,0);x.lineTo(cx,H);x.stroke();x.setLineDash([]);
+ cars.forEach(v=>car({...v,w:45},ey-12));cross.forEach(v=>car({...v,x:cx-12,w:45,c:v.c},v.y));
+ car({...bus,w:72,c:"#f1b83e"},bus.y,"SCHOOL BUS");for(let i=0;i<4;i++){x.fillStyle="#ffdf73";x.fillRect(bus.x+8+i*13,bus.y+4,8,7)}
+ if(step>=3){car({...tow,w:58,c:"#43bdd1"},tow.y,"TOW");x.strokeStyle="#d9f0f2";x.lineWidth=3;x.beginPath();x.moveTo(tow.x+42,tow.y+2);x.lineTo(tow.x+61,tow.y-16);x.stroke()}
+ car({...ambulance,w:64,c:"#f5f7f5"},ambulance.y,"AMBULANCE");x.fillStyle="#e33f4a";x.fillRect(ambulance.x+11,ambulance.y+7,13,10);x.fillRect(ambulance.x+15,ambulance.y+4,4,16);x.fillStyle=Math.floor(performance.now()/150)%2?"#ef4556":"#55c2f2";x.fillRect(ambulance.x+40,ambulance.y-5,12,5);
+ if(police)person(cx-100,ey-105,"#4d9fe9","TRAFFIC POLICE");if(step>=3)person(tow.x+15,tow.y+62,"#f0af44","TOW CREW");person(W*.16,H*.80,"#59d7c9","CITY RANGER");
+ if(cone)for(let i=0;i<7;i++){let q=W*.40+i*25;x.fillStyle="#ff8d38";x.beginPath();x.moveTo(q,ey+43);x.lineTo(q+11,ey+43);x.lineTo(q+5.5,ey+22);x.fill()}
+ requestAnimationFrame(loop)}
+function loop(n){let dt=Math.min(.05,(n-last)/1000||0);last=n;update(dt);draw()}requestAnimationFrame(loop);
+</script></body></html>
