@@ -17,8 +17,82 @@ $("#b").onclick=()=>{s=2;next("#b","#d");snd(580);$("#goal").textContent="Police
 $("#d").onclick=()=>{s=3;next("#d","#e");snd(650);$("#goal").textContent="Tow unit is approaching the bus from the side street.";radio("Tow unit is on scene. Wait for the connection.")};
 $("#e").onclick=()=>{if(s!==4)return;s=5;$("#e").disabled=true;snd(880);$("#goal").textContent="Tow unit is pulling the bus forward and turning south.";radio("Bus is clear. Release the ambulance, Ranger.")};
 addEventListener("keydown",e=>{const id={1:"#a",2:"#b",3:"#d",4:"#e"}[e.key];if(id)$(id).click()});
-function line(a,dir,stop,dt){let z=[...a].sort((p,q)=>dir>0?q.x-p.x:p.x-q.x);z.forEach((v,i)=>{let q=z[i-1],speed=v.v;if(stop&&v.x>stop-145&&v.x<stop)speed=0;if(q&&Math.abs(q.x-v.x)-q.w<24)speed=0;v.x+=dir*speed*60*dt;if(v.x>W+60)v.x=-60;if(v.x<-60)v.x=W+60})}
-function update(dt){if(!run)return;let cx=W*.52;line(E,1,s?cx-120:0,dt);line(Wb,-1,s?cx+120:0,dt);if(s<2){N.forEach(v=>v.y+=v.v*60*dt);S.forEach(v=>v.y-=v.v*60*dt)}if(s>=1&&s<5)amb.x=Math.min(bus.x-105,amb.x+.5*60*dt);if(s===3&&tow.y<bus.y-62)tow.y+=.9*60*dt;if(s===3&&tow.y>=bus.y-62){s=4;$("#e").disabled=false;$("#e").classList.add("ready");radio("Tow truck connected. Authorize the turn onto the side street.")}if(s===5){bus.t=Math.min(1,bus.t+dt*.23);let t=bus.t;bus.x=cx+W*.11*t;bus.y=H*.65+H*.21*t*t;tow.x=bus.x;tow.y=bus.y-65;if(t>.42)amb.x+=1.08*60*dt}if(amb.x>W+70){run=0;$("#start").classList.remove("hide");$(".brief").innerHTML="<small>MISSION COMPLETE</small><h2>AMBULANCE ROUTE CLEARED</h2><p>“Excellent work, Ranger. The patient is on the way to the hospital.”</p><button class='ready' onclick='location.reload()'>PLAY AGAIN</button>"}}
+function laneCars(cars,dir,stopLine,green,dt){
+  const GAP=18, groups={};
+  cars.forEach(car=>{const key=Math.round(car.y);(groups[key]??=[]).push(car)});
+  Object.values(groups).forEach(group=>{
+    group.sort((a,b)=>dir>0?b.x-a.x:a.x-b.x);
+    group.forEach((car,index)=>{
+      car.speed ??= 0;
+      let target=green?car.v:0;
+      if(green && stopLine!==null){
+        const before=dir>0 ? car.x<stopLine : car.x>stopLine;
+        const close=dir>0 ? car.x>stopLine-145 : car.x<stopLine+145;
+        if(before&&close) target=0;
+      }
+      const leader=group[index-1];
+      if(leader){
+        const gap=dir>0 ? leader.x-car.x-car.w : car.x-leader.x-leader.w;
+        if(gap<GAP+42) target=Math.min(target,Math.max(0,(gap-GAP)*0.035));
+      }
+      car.speed+=(target-car.speed)*Math.min(1,dt*5);
+      let next=car.x+dir*car.speed*60*dt;
+      if(leader){
+        if(dir>0) next=Math.min(next,leader.x-leader.w-GAP);
+        else next=Math.max(next,leader.x+leader.w+GAP);
+      }
+      car.x=next;
+      if(car.x>W+70)car.x=-70;
+      if(car.x<-70)car.x=W+70;
+    });
+  });
+}
+function verticalCars(cars,dir,stopLine,green,dt){
+  cars.sort((a,b)=>dir>0?a.y-b.y:b.y-a.y);
+  cars.forEach((car,index)=>{
+    car.speed ??= 0;
+    let target=green?car.v:0;
+    const before=dir>0 ? car.y<stopLine : car.y>stopLine;
+    const close=dir>0 ? car.y>stopLine-145 : car.y<stopLine+145;
+    if(before&&close) target=0;
+    const leader=cars[index-1];
+    if(leader){
+      const gap=dir>0 ? leader.y-car.y-car.w : car.y-leader.y-leader.w;
+      if(gap<60) target=Math.min(target,Math.max(0,(gap-18)*0.035));
+    }
+    car.speed+=(target-car.speed)*Math.min(1,dt*5);
+    let next=car.y+dir*car.speed*60*dt;
+    if(leader) next=dir>0?Math.min(next,leader.y-leader.w-18):Math.max(next,leader.y+leader.w+18);
+    car.y=next;
+    if(car.y>H+70)car.y=-70;
+    if(car.y<-70)car.y=H+70;
+  });
+}
+function update(dt){
+  if(!run)return;
+  const cx=W*.52, intersectionLeft=cx-75, intersectionRight=cx+75;
+  // Before priority: cross street has green; after priority: Harbor Avenue has green.
+  laneCars(E,1,intersectionLeft,s>=1,dt);
+  laneCars(Wb,-1,intersectionRight,s>=1,dt);
+  verticalCars(N,1,H*.39,s<1,dt);
+  verticalCars(S,-1,H*.71,s<1,dt);
+  if(s>=1&&s<5)amb.x=Math.min(bus.x-105,amb.x+.5*60*dt);
+  if(s===3&&tow.y<bus.y-62)tow.y+=.9*60*dt;
+  if(s===3&&tow.y>=bus.y-62){
+    s=4;$("#e").disabled=false;$("#e").classList.add("ready");
+    radio("Tow truck connected. Authorize the turn onto the side street.");
+  }
+  if(s===5){
+    bus.t=Math.min(1,bus.t+dt*.23);
+    const t=bus.t;bus.x=cx+W*.11*t;bus.y=H*.65+H*.21*t*t;
+    tow.x=bus.x;tow.y=bus.y-65;
+    if(t>.42)amb.x+=1.08*60*dt;
+  }
+  if(amb.x>W+70){
+    run=0;$("#start").classList.remove("hide");
+    $(".brief").innerHTML="<small>MISSION COMPLETE</small><h2>AMBULANCE ROUTE CLEARED</h2><p>Excellent work, Ranger. The patient is on the way to the hospital.</p><button class='ready' onclick='location.reload()'>PLAY AGAIN</button>";
+  }
+}
 function vehicle(v,vert=0,label=""){x.fillStyle="#111a24";if(vert){x.fillRect(v.x-13,v.y-3,26,v.w+6);x.fillStyle=v.c;x.fillRect(v.x-11,v.y,23,v.w);x.fillStyle="#bcecf2";x.fillRect(v.x-8,v.y+7,17,7)}else{x.fillRect(v.x-3,v.y-13,v.w+6,26);x.fillStyle=v.c;x.fillRect(v.x,v.y-11,v.w,23);x.fillStyle="#bcecf2";x.fillRect(v.x+7,v.y-8,v.w*.28,8);x.fillRect(v.x+v.w*.63,v.y-8,v.w*.18,8);x.fillStyle="#080f18";x.fillRect(v.x+6,v.y+11,9,5);x.fillRect(v.x+v.w-15,v.y+11,9,5)}if(label){x.fillStyle="#fff";x.font="bold 9px Arial";x.fillText(label,v.x+4,v.y+5)}}
 function draw(){let cx=W*.52,ey=H*.55;x.fillStyle="#78ad70";x.fillRect(0,0,W,H);x.fillStyle="#c7c1b4";x.fillRect(0,H*.30,W,H*.07);x.fillRect(0,H*.72,W,H*.07);x.fillRect(cx-W*.12,0,W*.24,H);x.fillStyle="#a79f8d";for(let i=0;i<80;i++)x.fillRect((i*97)%W,(i*53)%H,2,2);x.fillStyle="#293f51";x.fillRect(0,H*.39,W,H*.31);x.fillRect(cx-W*.07,0,W*.14,H);x.strokeStyle="#fff";x.lineWidth=2;x.setLineDash([20,16]);[H*.43,H*.49,H*.59,H*.65].forEach(y=>{x.beginPath();x.moveTo(0,y);x.lineTo(W,y);x.stroke()});[cx-34,cx+34].forEach(q=>{x.beginPath();x.moveTo(q,0);x.lineTo(q,H);x.stroke()});x.setLineDash([]);x.strokeStyle="#e1be52";x.lineWidth=4;x.beginPath();x.moveTo(0,H*.55);x.lineTo(W,H*.55);x.stroke();E.forEach(v=>vehicle(v));Wb.forEach(v=>vehicle(v));N.forEach(v=>vehicle(v,1));S.forEach(v=>vehicle(v,1));vehicle({...bus,w:78,c:"#f2b83f"},0,"SCHOOL BUS");vehicle({...tow,w:62,c:"#42b9d0"},1,"TOW");vehicle({...amb,w:66,c:"#f5f5ef"},0,"AMBULANCE");x.fillStyle="#e43e4b";x.fillRect(amb.x+11,amb.y-4,16,8);if(s>=2)for(let i=0;i<7;i++){let q=cx-145+i*22;x.fillStyle="#ff9138";x.beginPath();x.moveTo(q,H*.68);x.lineTo(q+10,H*.68);x.lineTo(q+5,H*.66);x.fill()}if(s>=1){x.fillStyle="#315584";x.fillRect(cx-125,H*.37,10,36);x.fillStyle="#54e09d";x.beginPath();x.arc(cx-120,H*.37,6,0,7);x.fill()}requestAnimationFrame(loop)}
 function loop(n){let dt=Math.min(.05,(n-last)/1000||0);last=n;update(dt);draw()}requestAnimationFrame(loop);
