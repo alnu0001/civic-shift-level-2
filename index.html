@@ -1,194 +1,232 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Civic Shift — First Failure</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#071121;color:#eef7ff;font-family:Arial,sans-serif;overflow:hidden}
-#ui{position:fixed;inset:0;pointer-events:none}button{font:inherit;cursor:pointer}
-#top{display:flex;justify-content:space-between;align-items:start;padding:20px;pointer-events:auto}
-h1{margin:0;font-size:28px;letter-spacing:2px}h1 i{color:#65e5d4}.small{font-size:11px;letter-spacing:2px;color:#8fa9c5}
-.card{background:#0b1d35dd;border:1px solid #31516f;border-radius:12px;padding:12px;box-shadow:0 8px 25px #0006}
-#health{width:185px;height:10px;background:#152d46;border-radius:8px;margin-top:6px;overflow:hidden}
-#health b{display:block;width:80%;height:100%;background:#4ee3a3;transition:.3s}
-#feed{position:absolute;top:115px;left:20px;width:255px;pointer-events:auto}
-#feed p{font-size:13px;line-height:1.4;color:#c6d8e8;margin:8px 0}
-#controls{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);display:flex;gap:8px;pointer-events:auto}
-.role{color:#dcefff;background:#102846;border:1px solid #446889;border-radius:10px;padding:11px 14px}
-.role:hover,.role.active{background:#1d5572;border-color:#7ceadf}
-#action{position:absolute;right:20px;bottom:20px;pointer-events:auto;background:#f7b94b;color:#122033;border:0;border-radius:10px;padding:14px 18px;font-weight:bold}
-#message{position:absolute;top:52%;left:50%;transform:translate(-50%,-50%);font-size:19px;font-weight:bold;text-align:center;text-shadow:0 2px 4px #000;pointer-events:none}
-#intro,#end{position:fixed;inset:0;background:#06101be8;display:flex;align-items:center;justify-content:center;z-index:5}
-.panel{width:min(520px,90vw);padding:30px;text-align:center}.panel h2{font-size:38px;margin:8px 0;color:#fff}.panel p{line-height:1.55;color:#bcd2e6}
-.start{background:#55d9c7;color:#062033;border:0;border-radius:9px;padding:14px 26px;font-weight:bold;font-size:16px;margin-top:12px}
-.hidden{display:none!important}
-kbd{padding:3px 7px;background:#193c5c;border-radius:5px}
+*{box-sizing:border-box}body{margin:0;overflow:hidden;background:#071222;color:#eef8ff;font-family:system-ui,Arial,sans-serif}canvas{display:block}#hud{position:fixed;inset:0;pointer-events:none}#brand,#status,#mission,#roles,#action,#overlay{pointer-events:auto}.card{background:#0c2038e8;border:1px solid #3f6684;border-radius:13px;box-shadow:0 10px 30px #0008}#brand{position:absolute;top:18px;left:20px}#brand small,#status small,#mission small{display:block;font-size:10px;letter-spacing:2px;color:#9fc2db}h1{margin:2px 0;font-size:27px;letter-spacing:1px}h1 i{color:#69dfd0}#status{position:absolute;right:20px;top:20px;width:225px;padding:12px}#bar{height:10px;background:#142e49;border-radius:8px;overflow:hidden;margin:7px 0}#bar b{display:block;width:82%;height:100%;background:#55e2a0;transition:width .25s}#mission{position:absolute;left:20px;top:115px;width:280px;padding:13px;font-size:14px;line-height:1.35}#mission p{margin:7px 0;color:#c7d9e7}#roles{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);display:flex;gap:8px}.role,#action,.start{border:1px solid #416988;border-radius:10px;background:#122d4b;color:#e8f7ff;padding:11px 14px;font-weight:700;cursor:pointer}.role:hover,.role.active{background:#216074;border-color:#7eebdd}#action{position:absolute;right:20px;bottom:20px;background:#f5ba48;color:#132238;border:0;padding:15px 18px}#toast{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);font-weight:800;font-size:18px;text-shadow:0 2px 4px #000;text-align:center;width:90%}#overlay{position:fixed;inset:0;background:#06121de8;display:flex;align-items:center;justify-content:center}.panel{max-width:540px;text-align:center;padding:30px;margin:18px}.panel h2{font-size:36px;margin:8px 0}.panel p{line-height:1.55;color:#c5d7e7}.start{border:0;background:#62ddca;color:#082033;font-size:16px;margin-top:8px}.hide{display:none!important}@media(max-width:650px){#mission{top:100px;width:230px;font-size:12px}#roles{width:100%;padding:0 10px;gap:4px}.role{padding:9px 7px;font-size:11px}#action{right:10px;bottom:67px;font-size:11px;padding:10px}}
 </style>
 </head>
 <body>
 <canvas id="game"></canvas>
 
-<div id="ui">
-  <div id="top">
-    <div>
-      <div class="small">CITY COORDINATION BUREAU</div>
-      <h1>CIVIC <i>SHIFT</i></h1>
-    </div>
-    <div class="card">
-      <div class="small">CITY HEALTH <span id="hp">80</span></div>
-      <div id="health"><b id="bar"></b></div>
-      <div class="small" style="margin-top:9px">SHIFT CLOCK: <span id="clock">08:00</span></div>
-    </div>
-  </div>
-
-  <div id="feed" class="card">
-    <div class="small">● LENS INCIDENT FEED</div>
-    <p id="mission">A school bus is blocking Civic Square. Keep the ambulance lane open.</p>
-    <p id="hint">Select Dispatcher first. Use keys 1–4 or the buttons below.</p>
-  </div>
-
-  <div id="message"></div>
-
-  <div id="controls">
-    <button class="role active" data-role="dispatch">1 Dispatcher</button>
-    <button class="role" data-role="signal">2 Signal</button>
-    <button class="role" data-role="route">3 Route</button>
-    <button class="role" data-role="field">4 Field</button>
-  </div>
-  <button id="action">AUTHORIZE PRIORITY</button>
+<div id="hud">
+<div id="brand"><small>CITY COORDINATION BUREAU</small><h1>CIVIC <i>SHIFT</i></h1></div>
+<div id="status" class="card"><small>CITY HEALTH <span id="hp">82</span></small><div id="bar"><b id="fill"></b></div><small>SHIFT CLOCK: <span id="clock">08:00</span> · SOUND ON</small></div>
+<div id="mission" class="card"><small>● LIVE INCIDENT FEED</small><p id="objective">A stalled school bus blocks the ambulance lane.</p><p id="hint">Start the shift, then authorize hospital priority.</p></div>
+<div id="toast"></div>
+<div id="roles">
+<button class="role active" data-r="dispatch">1 Dispatcher</button>
+<button class="role" data-r="signal">2 Signal</button>
+<button class="role" data-r="route">3 Route</button>
+<button class="role" data-r="field">4 Field</button>
+</div>
+<button id="action">AUTHORIZE PRIORITY</button>
 </div>
 
-<div id="intro">
-  <div class="panel card">
-    <div class="small">LEVEL 01 — PROOF OF CONCEPT</div>
-    <h2>FIRST FAILURE:<br><i>CIVIC SQUARE</i></h2>
-    <p>Luma Bay's smart traffic system thinks a stalled school bus is a parade. Coordinate four crews before the ambulance is trapped.</p>
-    <p><kbd>1–4</kbd> choose crew &nbsp; <kbd>Space</kbd> use tool &nbsp; click glowing map targets</p>
-    <button class="start" id="start">BEGIN THE SHIFT</button>
-  </div>
-</div>
-
-<div id="end" class="hidden">
-  <div class="panel card">
-    <div class="small">SHIFT REPORT</div>
-    <h2 id="result">CIVIC SQUARE SAVED</h2>
-    <p id="report"></p>
-    <button class="start" onclick="location.reload()">RUN ANOTHER SHIFT</button>
-  </div>
-</div>
+<div id="overlay"><div class="panel card">
+<small>LEVEL 01 · CIVIC SQUARE</small>
+<h2>FIRST FAILURE</h2>
+<p>The traffic AI has frozen a school bus in the emergency lane. Move traffic, clear the obstruction, and get the ambulance through.</p>
+<p>Cars move and avoid each other. Sound begins after Start.</p>
+<button class="start" id="start">BEGIN SHIFT</button>
+</div></div>
 
 <script>
-const c=document.querySelector("#game"),x=c.getContext("2d");
-const W=()=>c.width=innerWidth,D=()=>c.height=innerHeight;W();D();addEventListener("resize",()=>{W();D()});
+const C=document.querySelector("#game"),g=C.getContext("2d"),$=q=>document.querySelector(q);
+let W,H,run=false,role="dispatch",health=82,t=0,priority=false,green=false,detour=false,busClear=false,won=false,toastTimer,audio,sirenTimer;
+const lanes={east:{y:0,dir:1},west:{y:0,dir:-1}},cars=[];
 
-let running=false,role="dispatch",hp=80,time=0,phase=0,busFixed=false,laneOpen=false,priority=false,won=false;
-const roles={
- dispatch:["Dispatcher","Authorize hospital priority","Click the ambulance beacon or press Space."],
- signal:["Signal Tech","Change signal phase","Give the ambulance a green light."],
- route:["Route Planner","Open service detour","Move traffic away from the square."],
- field:["Field Crew","Repair stalled bus","Fix the bus after traffic is rerouted."]
+function resize(){
+  W=C.width=innerWidth;H=C.height=innerHeight;
+  lanes.east.y=H*.50;lanes.west.y=H*.68;
+}
+addEventListener("resize",resize);resize();
+
+function tone(f,d=.12,type="sine",v=.04){
+  if(!audio)return;
+  let o=audio.createOscillator(),a=audio.createGain();
+  o.type=type;o.frequency.value=f;a.gain.value=v;
+  o.connect(a).connect(audio.destination);
+  o.start();a.gain.exponentialRampToValueAtTime(.001,audio.currentTime+d);o.stop(audio.currentTime+d);
+}
+function startAudio(){
+  audio=new(window.AudioContext||window.webkitAudioContext)();
+  tone(523,.15,"triangle",.05);
+}
+function siren(){
+  if(!priority||won)return;
+  tone(760,.18,"square",.025);
+  setTimeout(()=>tone(1040,.18,"square",.025),190);
+}
+function notice(s){
+  $("#toast").textContent=s;
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>$("#toast").textContent="",2400);
+}
+function addCar(lane,x,color,speed=.7,name=""){
+  cars.push({lane,x,color,speed,v:speed,name,alive:true,w:name==="BUS"?58:42});
+}
+function setup(){
+  cars.length=0;
+  addCar("east",W*.10,"#4da4e8",.75);
+  addCar("east",W*.27,"#f2bd51",.72);
+  addCar("east",W*.50-55,"#f0b642",0,"BUS");
+  addCar("east",-80,"#ee6c5b",1.25,"EMS");
+  addCar("west",W*.88,"#f1f3ef",.76);
+  addCar("west",W*.68,"#64bfca",.68);
+  addCar("west",W*.37,"#9b78d8",.7);
+  addCar("west",W*.08,"#e57787",.65);
+}
+function setRole(r){
+  role=r;
+  document.querySelectorAll(".role").forEach(b=>b.classList.toggle("active",b.dataset.r===r));
+  let m={
+    dispatch:["AUTHORIZE PRIORITY","Authorize hospital priority so the ambulance may claim the lane."],
+    signal:["SET EMERGENCY GREEN","Give the ambulance a green signal."],
+    route:["OPEN DETOUR","Route ordinary traffic around Civic Square."],
+    field:["CLEAR BUS","Send field crew to repair and tow the school bus."]
+  }[r];
+  $("#action").textContent=m[0];$("#hint").textContent=m[1];
+}
+document.querySelectorAll(".role").forEach(b=>b.onclick=()=>setRole(b.dataset.r));
+addEventListener("keydown",e=>{
+  if("1234".includes(e.key))setRole(["dispatch","signal","route","field"][+e.key-1]);
+  if(e.code==="Space"){e.preventDefault();act();}
+});
+$("#action").onclick=act;
+$("#start").onclick=()=>{
+  run=true;$("#overlay").classList.add("hide");
+  startAudio();setup();
+  notice("Incident active. Dispatcher: authorize hospital priority.");
 };
 
-function text(t){document.querySelector("#message").textContent=t;clearTimeout(window.msg);window.msg=setTimeout(()=>document.querySelector("#message").textContent="",2200)}
-function setRole(r){
- role=r;
- document.querySelectorAll(".role").forEach(b=>b.classList.toggle("active",b.dataset.role===r));
- document.querySelector("#action").textContent=roles[r][1].toUpperCase();
- document.querySelector("#hint").textContent=roles[r][2];
-}
-document.querySelectorAll(".role").forEach(b=>b.onclick=()=>setRole(b.dataset.role));
-addEventListener("keydown",e=>{
- if("1234".includes(e.key))setRole(["dispatch","signal","route","field"][+e.key-1]);
- if(e.code==="Space"){e.preventDefault();act()}
-});
-document.querySelector("#action").onclick=act;
-document.querySelector("#start").onclick=()=>{running=true;document.querySelector("#intro").classList.add("hidden");text("Incident detected: Civic Square is failing.")};
-
 function act(){
- if(!running||won)return;
- if(role==="dispatch"){
-   priority=true;text("Hospital priority authorized. Signal team needed.");
- }else if(role==="signal"){
-   if(!priority)return text("Authorize hospital priority first.");
-   phase=1;text("Northbound light is GREEN. Route team needed.");
- }else if(role==="route"){
-   if(phase!==1)return text("The ambulance needs a green light first.");
-   laneOpen=true;text("Service detour opened. Field crew can reach bus.");
- }else if(role==="field"){
-   if(!laneOpen)return text("Open the detour before field crew enters.");
-   busFixed=true;text("Bus repaired. Ambulance lane is clear!");
- }
- check();
-}
-function check(){
- if(priority&&phase&&laneOpen&&busFixed&&!won){
-   won=true;setTimeout(()=>{
-     document.querySelector("#end").classList.remove("hidden");
-     document.querySelector("#result").textContent="CIVIC SQUARE SAVED";
-     document.querySelector("#report").textContent=`The ambulance crossed safely. Final City Health: ${Math.round(hp)}%. Your friends can now try a faster shift.`;
-   },900);
- }
+  if(!run||won)return;
+  if(role==="dispatch"){
+    if(priority)return notice("Priority is already active.");
+    priority=true;tone(660,.12,"triangle",.06);
+    sirenTimer=setInterval(siren,850);
+    $("#objective").textContent="Priority is active. Give the ambulance a green signal.";
+    notice("HOSPITAL PRIORITY AUTHORIZED");
+  }else if(role==="signal"){
+    if(!priority)return notice("Authorize priority first.");
+    green=true;tone(840,.15,"sine",.05);
+    $("#objective").textContent="Signal is green. Open the detour for regular traffic.";
+    notice("EMERGENCY SIGNAL GREEN");
+  }else if(role==="route"){
+    if(!green)return notice("The ambulance needs its green signal first.");
+    detour=true;tone(510,.13,"triangle",.05);
+    $("#objective").textContent="Traffic is diverting. Field crew can reach the school bus.";
+    notice("DETOUR OPEN — CIVILIANS REROUTED");
+  }else{
+    if(!detour)return notice("Open the detour before sending the field crew.");
+    busClear=true;tone(740,.1,"triangle",.05);
+    setTimeout(()=>tone(980,.16,"triangle",.05),110);
+    $("#objective").textContent="Bus cleared. Keep the route stable until EMS exits.";
+    notice("BUS REPAIRED — AMBULANCE MOVING");
+  }
 }
 
-function rect(a,b,w,h,col){x.fillStyle=col;x.fillRect(a,b,w,h)}
-function road(y,h){rect(0,y,c.width,h,"#273746");rect(0,y+8,c.width,h-16,"#33495a");x.strokeStyle="#d8c274";x.lineWidth=3;x.setLineDash([18,18]);x.beginPath();x.moveTo(0,y+h/2);x.lineTo(c.width,y+h/2);x.stroke();x.setLineDash([])}
-function car(px,py,col,label){
- x.fillStyle="#12202b";x.fillRect(px-3,py+4,46,22);x.fillStyle=col;x.fillRect(px,py,40,22);
- x.fillStyle="#bce7ee";x.fillRect(px+6,py+3,12,7);x.fillRect(px+23,py+3,11,7);
- x.fillStyle="#071121";x.fillRect(px+5,py+22,9,5);x.fillRect(px+28,py+22,9,5);
- if(label){x.fillStyle="#fff";x.font="bold 10px Arial";x.fillText(label,px+5,py+17)}
+function update(dt){
+  if(!run||won)return;
+  t+=dt;
+  let es=cars.filter(a=>a.lane==="east"&&a.alive).sort((a,b)=>b.x-a.x);
+  let ws=cars.filter(a=>a.lane==="west"&&a.alive).sort((a,b)=>a.x-b.x);
+
+  for(let group of [es,ws]){
+    for(let i=0;i<group.length;i++){
+      let a=group[i],ahead=group[i-1],desired=a.speed;
+      if(a.name==="BUS")desired=busClear?1:0;
+      if(a.name==="EMS"&&!busClear)desired=0;
+      if(a.lane==="east"&&!detour&&a.name!=="EMS"&&a.x>W*.42&&a.x<W*.5-100)desired=0;
+      if(ahead){
+        let gap=a.lane==="east"?ahead.x-a.x:a.x-ahead.x;
+        if(gap<72)desired=Math.min(desired,Math.max(0,(gap-38)*.025));
+      }
+      a.v+=(desired-a.v)*Math.min(1,dt*3);
+      a.x+=a.v*60*dt*(a.lane==="east"?1:-1);
+      if(a.name!=="BUS"&&((a.lane==="east"&&a.x>W+90)||(a.lane==="west"&&a.x<-90))){
+        a.x=a.lane==="east"?-70:W+70;
+      }
+    }
+  }
+
+  let ems=cars.find(a=>a.name==="EMS");
+  if(busClear&&ems&&ems.x>W+30){
+    won=true;clearInterval(sirenTimer);
+    tone(880,.2,"triangle",.06);
+    setTimeout(()=>tone(1170,.35,"triangle",.06),180);
+    $("#overlay").classList.remove("hide");
+    $("#overlay .panel").innerHTML="<small>SHIFT REPORT</small><h2>CIVIC SQUARE SAVED</h2><p>The ambulance cleared Civic Square. Moving traffic, lane spacing, and sound are active.</p><button class='start' onclick='location.reload()'>RUN AGAIN</button>";
+  }
+
+  health=Math.max(0,health-dt*(busClear?0:.35));
+  $("#hp").textContent=Math.ceil(health);
+  $("#fill").style.width=health+"%";
+  let s=Math.floor(t),m=8+Math.floor(s/60);
+  $("#clock").textContent=m+":"+(s%60+"").padStart(2,"0");
 }
-function pip(px,py,col,tool){
- x.fillStyle="#e7d7a7";x.beginPath();x.roundRect(px-12,py-17,24,22,8);x.fill();
- x.fillStyle="#172130";x.fillRect(px-6,py-7,3,3);x.fillRect(px+4,py-7,3,3);
- x.fillStyle=col;x.beginPath();x.roundRect(px-14,py+1,28,29,9);x.fill();
- x.fillStyle="#202837";x.fillRect(px-11,py+28,8,7);x.fillRect(px+3,py+28,8,7);
- x.fillStyle="#fff";x.font="10px Arial";x.fillText(tool,px-12,py+20);
+
+function box(x,y,w,h,c){
+  g.fillStyle="#111b26";g.fillRect(x-3,y+5,w+6,h);
+  g.fillStyle=c;g.fillRect(x,y,w,h);
+  g.fillStyle="#c6edf3";
+  g.fillRect(x+6,y+3,w*.28,7);g.fillRect(x+w*.62,y+3,w*.22,7);
+  g.fillStyle="#08131e";
+  g.fillRect(x+5,y+h-2,9,5);g.fillRect(x+w-14,y+h-2,9,5);
+}
+function pip(x,y,c,l){
+  g.fillStyle="#eadfae";g.beginPath();g.roundRect(x-12,y-22,24,22,8);g.fill();
+  g.fillStyle="#152031";g.fillRect(x-6,y-12,3,3);g.fillRect(x+4,y-12,3,3);
+  g.fillStyle=c;g.beginPath();g.roundRect(x-14,y-1,28,30,8);g.fill();
+  g.fillStyle="#1b2637";g.fillRect(x-11,y+27,8,7);g.fillRect(x+3,y+27,8,7);
+  g.fillStyle="#fff";g.font="11px Arial";g.fillText(l,x-4,y+18);
 }
 function draw(){
- const w=c.width,h=c.height;
- x.clearRect(0,0,w,h);rect(0,0,w,h,"#75bad0");
- rect(0,0,w,145,"#85c989");rect(0,h-130,w,130,"#86cb8d");
- road(h*.43,145);road(h*.68,115);
- rect(w*.42,145,w*.16,h-275,"#587d62");rect(w*.43,160,w*.14,h-305,"#79aa7e");
- x.fillStyle="#cad7ca";x.beginPath();x.arc(w*.5,h*.51,105,0,Math.PI*2);x.fill();
- x.fillStyle="#6f8a93";x.beginPath();x.arc(w*.5,h*.51,89,0,Math.PI*2);x.fill();
- x.fillStyle="#99d9e8";x.beginPath();x.arc(w*.5,h*.51,52,0,Math.PI*2);x.fill();
+  g.clearRect(0,0,W,H);
+  g.fillStyle="#83c985";g.fillRect(0,0,W,H);
+  g.fillStyle="#73b9d2";g.fillRect(0,H*.2,W,H*.62);
 
- rect(60,165,190,120,"#d9a766");rect(75,184,158,75,"#f6d497");
- rect(w-255,165,190,120,"#b96761");rect(w-238,184,155,75,"#e99480");
- rect(50,h-125,210,95,"#447c91");rect(w-260,h-125,210,95,"#55638d");
+  for(let y of [lanes.east.y,lanes.west.y]){
+    g.fillStyle="#2b4152";g.fillRect(0,y-55,W,110);
+    g.strokeStyle="#e2c875";g.lineWidth=3;g.setLineDash([20,18]);
+    g.beginPath();g.moveTo(0,y);g.lineTo(W,y);g.stroke();g.setLineDash([]);
+  }
 
- const cx=w*.5,cy=h*.51;
- car(cx-145,cy+47,"#f0b842","BUS");
- car(cx+70,cy-40,"#ef6a56","EMS");
- car(cx-260,cy-93,"#4d9ee8","");
- car(cx+190,cy+73,"#f3f3ef","");
+  g.fillStyle="#52785f";g.fillRect(W*.46,H*.2,W*.09,H*.62);
+  g.fillStyle="#7eaf7e";g.fillRect(W*.472,H*.22,W*.066,H*.58);
 
- pip(cx-220,cy-150,"#55bde8","D");
- pip(cx+245,cy-148,"#67d8c8","S");
- pip(cx-238,cy+150,"#f3b958","R");
- pip(cx+235,cy+155,"#ed7666","F");
+  g.fillStyle="#c7d9d0";g.beginPath();g.arc(W*.505,H*.59,84,0,7);g.fill();
+  g.fillStyle="#71909a";g.beginPath();g.arc(W*.505,H*.59,67,0,7);g.fill();
+  g.fillStyle="#9bdded";g.beginPath();g.arc(W*.505,H*.59,42,0,7);g.fill();
 
- x.strokeStyle=priority?"#ffd45c":"#777";x.lineWidth=4;
- x.beginPath();x.arc(cx+90,cy-60,28,0,Math.PI*2);x.stroke();
- if(priority){x.fillStyle="#ffd45c";x.font="bold 12px Arial";x.fillText("PRIORITY",cx+55,cy-98)}
+  for(let a of cars){
+    if(!a.alive)continue;
+    box(a.x,lanes[a.lane].y-15,a.w,24,a.color);
+    if(a.name){
+      g.fillStyle="#fff";g.font="bold 10px Arial";
+      g.fillText(a.name,a.x+5,lanes[a.lane].y+1);
+    }
+  }
 
- x.fillStyle="rgba(5,16,29,.8)";x.fillRect(cx-96,cy-10,192,42);
- x.fillStyle="#fff";x.font="bold 13px Arial";
- x.fillText(busFixed?"BUS REPAIRED":laneOpen?"FIELD CREW: REPAIR BUS":phase?"ROUTE: OPEN DETOUR":priority?"SIGNAL: GIVE GREEN":"DISPATCH: AUTHORIZE EMS",cx-82,cy+16);
+  pip(W*.34,H*.31,"#55b8e8","D");
+  pip(W*.67,H*.31,"#68d8c7","S");
+  pip(W*.33,H*.78,"#efb955","R");
+  pip(W*.67,H*.78,"#ed7666","F");
 
- if(running&&!won){
-   time+=1/60;
-   if(!busFixed&&time>8){hp=Math.max(0,hp-.022);document.querySelector("#hp").textContent=Math.round(hp);document.querySelector("#bar").style.width=hp+"%"}
-   let mins=8+Math.floor(time/60),secs=Math.floor(time%60);
-   document.querySelector("#clock").textContent=mins+":"+(secs<10?"0":"")+secs;
-   if(hp<=0){won=true;document.querySelector("#end").classList.remove("hidden");document.querySelector("#result").textContent="SHIFT FAILED";document.querySelector("#report").textContent="Civic Square gridlocked before the ambulance could cross."}
- }
- requestAnimationFrame(draw);
+  g.fillStyle=priority?"#ffdf60":"#5d6873";
+  g.beginPath();g.arc(W*.62,lanes.east.y-45,26,0,7);g.fill();
+
+  requestAnimationFrame(loop);
 }
-draw();
+let last=performance.now();
+function loop(n){
+  update(Math.min(.05,(n-last)/1000));
+  last=n;draw();
+}
+loop(last);
 </script>
 </body>
 </html>
