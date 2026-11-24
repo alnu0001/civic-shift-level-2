@@ -1,1 +1,0 @@
-export function roads(w,h){const cx=w*.52;return{cx,lanes:[['e1','h',1,h*.43,cx-88],['e2','h',1,h*.49,cx-88],['w1','h',-1,h*.59,w-(cx+88)],['w2','h',-1,h*.65,w-(cx+88)],['n1','v',1,cx-34,h*.39],['n2','v',1,cx+34,h*.39],['s1','v',-1,cx-34,h-h*.71],['s2','v',-1,cx+34,h-h*.71]].map(([id,axis,dir,fixed,stop])=>({id,axis,dir,fixed,stop}))}}
