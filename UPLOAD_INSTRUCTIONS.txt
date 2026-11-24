@@ -1,0 +1,4 @@
+1. Extract this ZIP.
+2. Rename REPLACE_INDEX.html to index.html.
+3. Delete the old index.html in GitHub, then upload this new index.html plus src, levels, and assets folders.
+4. Keep .github/workflows/pages.yml already in your repository.
