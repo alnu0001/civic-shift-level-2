@@ -3,17 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>City Ranger — Harbor Junction</title>
+<title>City Ranger — Harbor Avenue</title>
 <style>
-*{box-sizing:border-box}body{margin:0;overflow:hidden;background:#08131f;color:#eff9ff;font-family:Arial,sans-serif}canvas{display:block}
-#ui{position:fixed;inset:0;pointer-events:none}.card{background:#092038ec;border:1px solid #47708c;border-radius:14px;box-shadow:0 10px 28px #0008}
-#brand,#mission,#stats,#command,#overlay{pointer-events:auto}#brand{position:absolute;top:18px;left:22px}small{display:block;font-size:10px;letter-spacing:2px;color:#a9cce1}h1{margin:3px 0;font-size:29px}h1 i{color:#ffca54}
-#stats{position:absolute;right:20px;top:20px;padding:13px;width:230px}.bar{height:9px;border-radius:7px;background:#193751;overflow:hidden;margin:5px 0 10px}.bar b{display:block;width:100%;height:100%;background:#5ce0a1;transition:.3s}
-#mission{position:absolute;left:20px;top:110px;width:300px;padding:14px;font-size:14px;line-height:1.4}#mission p{color:#d4e5f0;margin:7px 0}
-#command{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);width:min(590px,92vw);padding:13px;text-align:center}#command p{margin:4px 0 10px;color:#d2e2ed}
-button{cursor:pointer;font:inherit;font-weight:bold}#order,.start{border:0;border-radius:10px;padding:13px 22px;background:#ffc752;color:#102437}#order:hover,.start:hover{background:#ffe296}#order:disabled{background:#536a7a;color:#c9d8df}
-#toast{position:absolute;top:51%;left:50%;transform:translate(-50%,-50%);font-weight:bold;font-size:18px;text-align:center;text-shadow:0 2px 4px #000;width:90%}
-#overlay{position:fixed;inset:0;background:#06111eea;display:flex;align-items:center;justify-content:center}.panel{max-width:540px;margin:20px;padding:31px;text-align:center}.panel h2{font-size:36px;margin:8px 0}.panel p{line-height:1.55;color:#cbddea}.hide{display:none!important}
+*{box-sizing:border-box}body{margin:0;overflow:hidden;background:#07121f;color:#f1f9ff;font-family:Arial,sans-serif}canvas{display:block}
+#ui{position:fixed;inset:0;pointer-events:none}.panel{background:#092039e8;border:1px solid #4c7895;border-radius:14px;box-shadow:0 12px 32px #0008}
+#brand,#status,#mission,#tools,#overlay{pointer-events:auto}#brand{position:absolute;top:18px;left:22px}small{display:block;color:#a9cbe1;font-size:10px;letter-spacing:2px}h1{margin:3px 0;font-size:29px}h1 i{color:#ffcb58}
+#status{position:absolute;right:20px;top:18px;width:230px;padding:13px}.bar{height:9px;background:#183751;border-radius:8px;overflow:hidden;margin:5px 0 10px}.bar b{display:block;height:100%;width:100%;background:#58dda3;transition:.25s}
+#mission{position:absolute;left:20px;top:110px;width:300px;padding:14px;font-size:14px;line-height:1.4}#mission p{margin:7px 0;color:#d0e1ed}
+#tools{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);width:min(760px,94vw);padding:11px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.tool{background:#12304c;border:1px solid #4f7692;color:#edf9ff;border-radius:10px;padding:10px 12px;font-weight:bold;cursor:pointer}.tool:hover:not(:disabled){background:#216176;border-color:#8beedd}.tool:disabled{opacity:.42;cursor:not-allowed}.tool.active{background:#f9c552;color:#112538;border:0}
+#toast{position:absolute;top:51%;left:50%;transform:translate(-50%,-50%);font-size:18px;font-weight:bold;text-shadow:0 2px 5px #000;text-align:center;width:90%}
+#overlay{position:fixed;inset:0;background:#06111eea;display:flex;align-items:center;justify-content:center}.brief{max-width:560px;margin:20px;padding:31px;text-align:center}.brief h2{font-size:36px;margin:8px 0}.brief p{line-height:1.55;color:#cbdde9}.start{border:0;border-radius:10px;background:#62ddca;color:#062033;padding:14px 26px;font-size:16px;font-weight:bold;cursor:pointer}.hide{display:none!important}
+@media(max-width:650px){#mission{top:98px;width:230px;font-size:12px}#status{width:180px;right:10px;top:10px}#brand{top:10px;left:12px}h1{font-size:22px}.tool{font-size:11px;padding:9px}}
 </style>
 </head>
 <body>
@@ -22,227 +23,249 @@ button{cursor:pointer;font:inherit;font-weight:bold}#order,.start{border:0;borde
 <div id="ui">
   <div id="brand"><small>CITY EMERGENCY RESPONSE</small><h1>CITY <i>RANGER</i></h1></div>
 
-  <div id="stats" class="card">
-    <small>CITY CONDITION <span id="condition">100</span>%</small>
-    <div class="bar"><b id="conditionBar"></b></div>
+  <div id="status" class="panel">
+    <small>CITY CONDITION <span id="health">100</span>%</small>
+    <div class="bar"><b id="healthBar"></b></div>
     <small>MEDICAL WINDOW <span id="clock">01:30</span></small>
-    <div class="bar"><b id="timeBar" style="background:#ffc752"></b></div>
+    <div class="bar"><b id="timeBar" style="background:#ffc551"></b></div>
   </div>
 
-  <div id="mission" class="card">
-    <small>● HARBOR JUNCTION EMERGENCY</small>
-    <p id="objective">A school bus has broken down in the emergency lane.</p>
-    <p id="help">Activate emergency priority before the ambulance reaches the junction.</p>
+  <div id="mission" class="panel">
+    <small>● MISSION 1 · HARBOR AVENUE</small>
+    <p id="objective">A school bus has broken down in Harbor Avenue's emergency route.</p>
+    <p id="instruction">Activate emergency priority before the ambulance reaches the bus.</p>
   </div>
 
   <div id="toast"></div>
 
-  <div id="command" class="card">
-    <small>NEXT RANGER ORDER</small>
-    <p id="orderText">Give the ambulance priority at the traffic signal.</p>
-    <button id="order">ACTIVATE EMERGENCY SIGNAL</button>
+  <div id="tools" class="panel">
+    <button class="tool" id="priority">1 · EMERGENCY PRIORITY</button>
+    <button class="tool" id="cones" disabled>2 · CLOSE EMERGENCY LANE</button>
+    <button class="tool" id="tow" disabled>3 · DISPATCH TOW CREW</button>
+    <button class="tool" id="clear" disabled>4 · CLEAR SCHOOL BUS</button>
   </div>
 </div>
 
 <div id="overlay">
-  <div class="panel card">
-    <small>MISSION 1 · HARBOR JUNCTION</small>
+  <div class="brief panel">
+    <small>MISSION 1 · HARBOR AVENUE</small>
     <h2>KEEP THE AMBULANCE MOVING</h2>
-    <p>A school bus has broken down in Harbor Junction's emergency lane. An ambulance carrying a critical patient is approaching.</p>
-    <p>You are the City Ranger. Direct the traffic officer, tow crew, and emergency route so the patient reaches care safely.</p>
+    <p>A school bus has broken down in Harbor Avenue's emergency route. An ambulance carrying a critical patient is approaching.</p>
+    <p>You are the City Ranger. Use traffic police, road cones, and a tow crew to build a protected corridor before time runs out.</p>
+    <p><small>Use the four response controls below the map. Press 1–4 as shortcuts.</small></p>
     <button class="start" id="start">BEGIN RESPONSE</button>
   </div>
 </div>
 
 <script>
-const c=document.querySelector("#game"),x=c.getContext("2d"),$=s=>document.querySelector(s);
-let W,H,start=false,stage=0,condition=100,time=90,last=0,audio,siren,toastTimer;
-let busX,towX,ambulanceX,traffic=[],officer=false,crew=false,busMoving=false,complete=false;
+const C=document.querySelector("#game"),X=C.getContext("2d"),$=q=>document.querySelector(q);
+let W,H,running=false,done=false,phase=0,health=100,time=90,last=0,audio,sirenLoop,toastTimer;
+let bus,ambulance,tow,officer=false,cones=false,crew=false,carsEast=[],carsWest=[],rain=[];
+const btn={p:$("#priority"),c:$("#cones"),t:$("#tow"),x:$("#clear")};
 
-function resize(){W=c.width=innerWidth;H=c.height=innerHeight}
+function resize(){W=C.width=innerWidth;H=C.height=innerHeight}
 addEventListener("resize",resize);resize();
 
-function tone(f,d=.12,type="sine",v=.045){
+function tone(freq,d=.14,type="sine",vol=.04){
   if(!audio)return;
   let o=audio.createOscillator(),g=audio.createGain();
-  o.type=type;o.frequency.value=f;g.gain.value=v;
+  o.type=type;o.frequency.value=freq;g.gain.value=vol;
   o.connect(g).connect(audio.destination);o.start();
   g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+d);o.stop(audio.currentTime+d);
 }
-function busBreak(){
-  tone(100,.24,"sawtooth",.07);
-  setTimeout(()=>tone(70,.32,"square",.06),160);
-  setTimeout(()=>tone(130,.10,"square",.04),430);
+function breakdownSound(){
+  tone(95,.23,"sawtooth",.07);
+  setTimeout(()=>tone(63,.30,"square",.055),150);
+  setTimeout(()=>tone(125,.12,"square",.04),430);
 }
-function ambulanceSiren(){
-  if(stage<1||complete)return;
-  tone(700,.18,"square",.022);
-  setTimeout(()=>tone(1040,.18,"square",.022),190);
+function siren(){
+  if(phase<1||done)return;
+  tone(730,.18,"square",.022);
+  setTimeout(()=>tone(1060,.18,"square",.022),190);
 }
 function say(s){
   $("#toast").textContent=s;clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>$("#toast").textContent="",2300);
+  toastTimer=setTimeout(()=>$("#toast").textContent="",2400);
 }
+function setText(o,i){$("#objective").textContent=o;$("#instruction").textContent=i}
+function enable(b){b.disabled=false;b.classList.add("active")}
+function completeTool(b){b.disabled=true;b.classList.remove("active")}
+
 function setup(){
-  busX=W*.61;towX=-130;ambulanceX=-130;
-  traffic=[
-    {x:W*.05,color:"#4f9fe8",speed:.72},
-    {x:W*.19,color:"#d67ec7",speed:.66},
-    {x:W*.34,color:"#f1b846",speed:.70},
-    {x:W*.78,color:"#7c91e7",speed:.76},
-    {x:W*.92,color:"#65c8ba",speed:.67}
+  const e=H*.49,w=H*.68;
+  bus={x:W*.61,y:e-12,w:76,v:0,clear:false,offY:0};
+  ambulance={x:-115,y:e-12,w:68,v:0};
+  tow={x:-120,y:H*.79,w:63,v:0};
+  carsEast=[
+    {x:W*.03,y:e-12,w:45,v:.72,base:.72,col:"#58a7e9"},
+    {x:W*.17,y:e-12,w:45,v:.66,base:.66,col:"#de7dc6"},
+    {x:W*.31,y:e-12,w:45,v:.74,base:.74,col:"#f0b943"},
+    {x:W*.79,y:e-12,w:45,v:.71,base:.71,col:"#807fe1"},
+    {x:W*.94,y:e-12,w:45,v:.67,base:.67,col:"#57c3ba"}
   ];
+  carsWest=[
+    {x:W*.95,y:w-12,w:45,v:.70,base:.70,col:"#e97b8a"},
+    {x:W*.79,y:w-12,w:45,v:.75,base:.75,col:"#f5f4ed"},
+    {x:W*.63,y:w-12,w:45,v:.68,base:.68,col:"#6cc2d8"},
+    {x:W*.45,y:w-12,w:45,v:.72,base:.72,col:"#a17de0"},
+    {x:W*.26,y:w-12,w:45,v:.66,base:.66,col:"#e5a05e"}
+  ];
+  rain=Array.from({length:70},()=>({x:Math.random()*W,y:Math.random()*H,s:3+Math.random()*6}));
 }
-function setCommand(text,label){
-  $("#orderText").textContent=text;$("#order").textContent=label;
+function followEast(list,stopX,dt){
+  let arr=[...list].sort((a,b)=>b.x-a.x);
+  arr.forEach((a,i)=>{
+    let target=a.base,lead=arr[i-1];
+    if(stopX&&a.x>stopX-170&&a.x<stopX)target=0;
+    if(lead){
+      let gap=lead.x-a.x-lead.w;
+      if(gap<42)target=Math.min(target,Math.max(0,gap*.03));
+    }
+    a.v+=(target-a.v)*Math.min(1,dt*4);
+    a.x+=a.v*60*dt;
+    if(a.x>W+65)a.x=-65;
+  });
 }
+function followWest(list,dt){
+  let arr=[...list].sort((a,b)=>a.x-b.x);
+  arr.forEach((a,i)=>{
+    let target=a.base,lead=arr[i-1];
+    if(lead){
+      let gap=a.x-lead.x-lead.w;
+      if(gap<42)target=Math.min(target,Math.max(0,gap*.03));
+    }
+    a.v+=(target-a.v)*Math.min(1,dt*4);
+    a.x-=a.v*60*dt;
+    if(a.x<-70)a.x=W+70;
+  });
+}
+
+function activatePriority(){
+  if(!running||phase!==0)return;
+  phase=1;officer=true;completeTool(btn.p);enable(btn.c);tone(790,.17,"triangle");
+  sirenLoop=setInterval(siren,790);
+  setText("Emergency priority is active. A traffic officer is stopping civilian traffic.","Close the emergency lane so no civilian vehicle enters the ambulance corridor.");
+  say("TRAFFIC POLICE: EMERGENCY PRIORITY ACTIVE");
+}
+function closeLane(){
+  if(phase!==1)return;
+  phase=2;cones=true;completeTool(btn.c);enable(btn.t);tone(540,.15,"triangle");
+  setText("Traffic cones protect the emergency route. Civilian cars are queueing safely.","Dispatch the tow crew to remove the school bus.");
+  say("EMERGENCY LANE CLOSED");
+}
+function dispatchTow(){
+  if(phase!==2)return;
+  phase=3;crew=true;tow.v=.92;completeTool(btn.t);tone(620,.14,"square");
+  setText("Tow truck and road crew are approaching the school bus.","Wait until the tow crew reaches the breakdown.");
+  say("TOW CREW EN ROUTE");
+}
+function clearBus(){
+  if(phase!==4)return;
+  phase=5;bus.clear=true;completeTool(btn.x);tone(850,.15,"triangle");
+  setText("The bus is being moved from Harbor Avenue. The ambulance corridor is clear.","Hold the route. The ambulance is moving toward the hospital.");
+  say("SCHOOL BUS CLEARED — AMBULANCE RELEASED");
+}
+btn.p.onclick=activatePriority;btn.c.onclick=closeLane;btn.t.onclick=dispatchTow;btn.x.onclick=clearBus;
+addEventListener("keydown",e=>{
+  if(e.key==="1")activatePriority();if(e.key==="2")closeLane();
+  if(e.key==="3")dispatchTow();if(e.key==="4")clearBus();
+});
 $("#start").onclick=()=>{
   audio=new(window.AudioContext||window.webkitAudioContext)();
-  start=true;setup();$("#overlay").classList.add("hide");
-  setTimeout(busBreak,350);
-  say("School bus breakdown reported. Emergency lane blocked.");
+  setup();running=true;$("#overlay").classList.add("hide");
+  setTimeout(breakdownSound,300);
+  say("BUS BREAKDOWN REPORTED — AMBULANCE INBOUND");
 };
-$("#order").onclick=act;
-addEventListener("keydown",e=>{if(e.code==="Space"){e.preventDefault();act()}});
-
-function act(){
-  if(!start||complete)return;
-
-  if(stage===0){
-    stage=1;officer=true;tone(780,.16,"triangle");
-    siren=setInterval(ambulanceSiren,780);
-    $("#objective").textContent="Emergency signal active. The traffic officer is holding regular vehicles.";
-    $("#help").textContent="Dispatch the tow crew to clear the school bus.";
-    setCommand("Send the tow truck and road crew into the emergency lane.","DISPATCH TOW CREW");
-    say("TRAFFIC OFFICER: EMERGENCY PRIORITY ACTIVE");
-
-  }else if(stage===1){
-    stage=2;crew=true;tone(580,.16,"triangle");
-    $("#objective").textContent="Tow truck is approaching the broken-down bus.";
-    $("#help").textContent="Wait until the road crew reaches the bus.";
-    $("#order").disabled=true;$("#order").textContent="TOW CREW EN ROUTE";
-    say("TOW CREW DISPATCHED");
-
-  }else if(stage===3){
-    stage=4;busMoving=true;tone(860,.14,"triangle");
-    $("#objective").textContent="The school bus is being towed clear. The ambulance has a safe corridor.";
-    $("#help").textContent="Keep the emergency signal active until the ambulance exits.";
-    $("#order").disabled=true;$("#order").textContent="CORRIDOR ACTIVE";
-    say("BUS CLEARED — AMBULANCE RELEASED");
-  }
-}
 
 function update(dt){
-  if(!start||complete)return;
-
-  time=Math.max(0,time-dt);
-  condition=Math.max(0,condition-dt*(busMoving?.06:.38));
-  $("#condition").textContent=Math.ceil(condition);
-  $("#conditionBar").style.width=condition+"%";
+  if(!running||done)return;
+  time=Math.max(0,time-dt);health=Math.max(0,health-dt*(phase>=5?.05:.38));
+  $("#health").textContent=Math.ceil(health);$("#healthBar").style.width=health+"%";
   $("#timeBar").style.width=(time/90*100)+"%";
-  let sec=Math.ceil(time);
-  $("#clock").textContent="01:"+String(Math.min(59,sec)).padStart(2,"0");
+  let s=Math.ceil(time);$("#clock").textContent="01:"+String(Math.min(59,s)).padStart(2,"0");
 
-  for(let i=0;i<traffic.length;i++){
-    let car=traffic[i],target=car.speed;
-    if(stage===0&&car.x>W*.43&&car.x<busX-65)target=.12;
-    if(stage>=1&&car.x>W*.43&&car.x<busX-65)target=.34;
-    let ahead=traffic[i+1];
-    if(ahead&&ahead.x-car.x<67)target=Math.min(target,.08);
-    car.x+=target*60*dt;
-    if(car.x>W+60)car.x=-65;
+  followEast(carsEast,phase>=1?W*.48:0,dt);
+  followWest(carsWest,dt);
+
+  if(phase>=1&&!bus.clear){
+    ambulance.v=.58;
+    ambulance.x=Math.min(bus.x-105,ambulance.x+ambulance.v*60*dt);
+  }
+  if(phase===3&&tow.x<bus.x-83)tow.x+=tow.v*60*dt;
+  if(phase===3&&tow.x>=bus.x-83){
+    phase=4;enable(btn.x);tone(720,.13,"triangle");
+    setText("Tow crew has reached the school bus.","Authorize the crew to remove the bus from the emergency route.");
+    say("TOW CREW READY — AUTHORIZE CLEARANCE");
+  }
+  if(bus.clear){
+    bus.offY=Math.min(145,bus.offY+50*dt);
+    ambulance.v=1.15;ambulance.x+=ambulance.v*60*dt;
   }
 
-  if(stage>=2&&towX<busX-72)towX+=.86*60*dt;
-
-  if(stage===2&&towX>=busX-72){
-    stage=3;
-    $("#objective").textContent="Tow crew has reached the school bus.";
-    $("#help").textContent="Authorize the crew to pull the bus out of the emergency lane.";
-    $("#order").disabled=false;
-    setCommand("Clear the bus and release the ambulance route.","CLEAR SCHOOL BUS");
-    say("TOW CREW READY FOR AUTHORIZATION");
-  }
-
-  if(busMoving)busX+=.85*60*dt;
-  if(stage>=4)ambulanceX+=1.18*60*dt;
-  else if(stage>=1)ambulanceX=Math.min(W*.30,ambulanceX+.55*60*dt);
-
-  if(stage>=4&&ambulanceX>W+70){
-    complete=true;clearInterval(siren);
-    tone(900,.16,"triangle");setTimeout(()=>tone(1180,.35,"triangle"),180);
+  for(let r of rain){r.y+=r.s;if(r.y>H){r.y=-10;r.x=Math.random()*W}}
+  if(ambulance.x>W+75){
+    done=true;clearInterval(sirenLoop);tone(900,.16,"triangle");setTimeout(()=>tone(1190,.34,"triangle"),180);
     $("#overlay").classList.remove("hide");
-    $("#overlay .panel").innerHTML="<small>MISSION COMPLETE</small><h2>PATIENT DELIVERED SAFELY</h2><p>The emergency corridor stayed open and the ambulance reached the hospital route.</p><p><b>City condition: "+Math.ceil(condition)+"%</b></p><button class='start' onclick='location.reload()'>PLAY AGAIN</button>";
+    $("#overlay .brief").innerHTML="<small>MISSION COMPLETE</small><h2>PATIENT DELIVERED SAFELY</h2><p>The ambulance cleared Harbor Avenue with a protected emergency corridor.</p><p><b>City condition: "+Math.ceil(health)+"%</b></p><button class='start' onclick='location.reload()'>PLAY AGAIN</button>";
   }
-  if(time<=0||condition<=0){
-    complete=true;clearInterval(siren);
+  if(time<=0||health<=0){
+    done=true;clearInterval(sirenLoop);
     $("#overlay").classList.remove("hide");
-    $("#overlay .panel").innerHTML="<small>MISSION FAILED</small><h2>THE ROUTE CLOSED</h2><p>The city response took too long. Try again and issue orders faster.</p><button class='start' onclick='location.reload()'>TRY AGAIN</button>";
+    $("#overlay .brief").innerHTML="<small>MISSION FAILED</small><h2>THE ROUTE CLOSED</h2><p>The patient could not wait. Issue emergency orders faster next time.</p><button class='start' onclick='location.reload()'>TRY AGAIN</button>";
   }
 }
 
-function car(xp,yp,w,color,label=""){
-  x.fillStyle="#101b27";x.fillRect(xp-3,yp+5,w+6,25);
-  x.fillStyle=color;x.fillRect(xp,yp,w,23);
-  x.fillStyle="#bfe9f0";x.fillRect(xp+6,yp+3,w*.28,7);x.fillRect(xp+w*.62,yp+3,w*.20,7);
-  x.fillStyle="#07121d";x.fillRect(xp+5,yp+21,9,5);x.fillRect(xp+w-14,yp+21,9,5);
-  if(label){x.fillStyle="#fff";x.font="bold 9px Arial";x.fillText(label,xp+5,yp+16);}
+function vehicle(v,label=""){
+  X.save();X.shadowColor="#00101d";X.shadowBlur=7;X.shadowOffsetY=5;
+  X.fillStyle="#101b26";X.fillRect(v.x-3,v.y+6,v.w+6,24);
+  X.fillStyle=v.col||"#f3b83e";X.fillRect(v.x,v.y,v.w,23);X.restore();
+  X.fillStyle="#c7edf3";X.fillRect(v.x+6,v.y+3,v.w*.27,7);X.fillRect(v.x+v.w*.63,v.y+3,v.w*.19,7);
+  X.fillStyle="#07131f";X.fillRect(v.x+5,v.y+21,9,5);X.fillRect(v.x+v.w-14,v.y+21,9,5);
+  if(label){X.fillStyle="#fff";X.font="bold 9px Arial";X.fillText(label,v.x+5,v.y+16)}
 }
-function ambulance(xp,yp){
-  car(xp,yp,64,"#f4f7f5","AMBULANCE");
-  x.fillStyle="#e64048";x.fillRect(xp+10,yp+7,12,10);x.fillRect(xp+14,yp+4,4,16);x.fillRect(xp+8,yp+10,16,4);
-  x.fillStyle=(Math.floor(performance.now()/170)%2)?"#ff4c55":"#54bdf0";
-  x.fillRect(xp+38,yp-4,10,5);
+function drawAmbulance(){
+  let v=ambulance;vehicle({...v,col:"#f5f7f4"},"AMBULANCE");
+  X.fillStyle="#e23f4a";X.fillRect(v.x+10,v.y+7,13,10);X.fillRect(v.x+14,v.y+4,4,16);X.fillRect(v.x+8,v.y+10,17,4);
+  X.fillStyle=Math.floor(performance.now()/150)%2?"#ef4554":"#55bcf0";X.fillRect(v.x+40,v.y-5,12,5);
 }
-function bus(xp,yp){
-  car(xp,yp,70,"#f1b83e","SCHOOL BUS");
-  x.fillStyle="#ffdf70";x.fillRect(xp+8,yp+4,8,7);x.fillRect(xp+21,yp+4,8,7);x.fillRect(xp+34,yp+4,8,7);
-  if(!busMoving){x.fillStyle="#ff6a45";x.beginPath();x.arc(xp+63,yp-4,4,0,7);x.fill();}
+function drawBus(){
+  let v=bus;vehicle({x:v.x,y:v.y+v.offY,w:v.w,col:"#f2b83e"},"SCHOOL BUS");
+  for(let i=0;i<4;i++){X.fillStyle="#ffdf75";X.fillRect(v.x+8+i*13,v.y+v.offY+4,8,7)}
+  if(!bus.clear){X.fillStyle="#ff674d";X.beginPath();X.arc(v.x+68,v.y-5,4,0,7);X.fill()}
 }
-function towTruck(xp,yp){
-  car(xp,yp,58,"#42bad1","TOW");
-  x.strokeStyle="#cfe8ee";x.lineWidth=3;x.beginPath();x.moveTo(xp+44,yp+3);x.lineTo(xp+61,yp-14);x.lineTo(xp+68,yp+3);x.stroke();
+function drawTow(){
+  if(!crew)return;let v=tow;vehicle({...v,col:"#42b9d1"},"TOW");
+  X.strokeStyle="#d8eff2";X.lineWidth=3;X.beginPath();X.moveTo(v.x+42,v.y+2);X.lineTo(v.x+58,v.y-16);X.lineTo(v.x+67,v.y+2);X.stroke();
 }
-function person(px,py,color,label){
-  x.fillStyle="#eadba5";x.beginPath();x.arc(px,py-15,10,0,7);x.fill();
-  x.fillStyle="#1a2635";x.fillRect(px-4,py-17,2,2);x.fillRect(px+3,py-17,2,2);
-  x.fillStyle=color;x.fillRect(px-11,py-4,22,25);
-  x.fillStyle="#172434";x.fillRect(px-8,py+20,6,7);x.fillRect(px+3,py+20,6,7);
-  x.fillStyle="#fff";x.font="bold 9px Arial";x.fillText(label,px-15,py+39);
+function person(px,py,col,label){
+  X.fillStyle="#eadba8";X.beginPath();X.arc(px,py-15,10,0,7);X.fill();
+  X.fillStyle="#162435";X.fillRect(px-4,py-18,2,2);X.fillRect(px+3,py-18,2,2);
+  X.fillStyle=col;X.fillRect(px-11,py-4,22,25);
+  X.fillStyle="#172535";X.fillRect(px-8,py+20,6,7);X.fillRect(px+3,py+20,6,7);
+  X.fillStyle="#fff";X.font="bold 9px Arial";X.fillText(label,px-17,py+39);
 }
 function draw(){
-  let roadY=H*.53,grass=H*.22;
-  x.clearRect(0,0,W,H);
-  x.fillStyle="#89ca88";x.fillRect(0,0,W,H);
-  x.fillStyle="#76bdd4";x.fillRect(0,grass,W,H*.58);
-  x.fillStyle="#2b4052";x.fillRect(0,roadY-72,W,145);
-  x.strokeStyle="#e3ca79";x.lineWidth=3;x.setLineDash([22,18]);
-  x.beginPath();x.moveTo(0,roadY);x.lineTo(W,roadY);x.stroke();x.setLineDash([]);
+  const e=H*.49,w=H*.68,cx=W*.53;
+  X.clearRect(0,0,W,H);
+  let sky=X.createLinearGradient(0,0,0,H);sky.addColorStop(0,"#427b9b");sky.addColorStop(.3,"#76bed2");sky.addColorStop(1,"#81c985");X.fillStyle=sky;X.fillRect(0,0,W,H);
+  X.fillStyle="#85c888";X.fillRect(0,H*.77,W,H*.23);
+  for(let y of [e,w]){
+    X.fillStyle="#263e51";X.fillRect(0,y-55,W,110);
+    X.strokeStyle="#e0c576";X.lineWidth=3;X.setLineDash([21,18]);X.beginPath();X.moveTo(0,y);X.lineTo(W,y);X.stroke();X.setLineDash([]);
+  }
+  X.fillStyle="#506f5b";X.fillRect(cx-67,H*.20,134,H*.58);X.fillStyle="#7dac79";X.fillRect(cx-48,H*.22,96,H*.54);
+  X.fillStyle="#cfdfd2";X.beginPath();X.arc(cx,H*.63,76,0,7);X.fill();X.fillStyle="#71919c";X.beginPath();X.arc(cx,H*.63,59,0,7);X.fill();
+  carsEast.forEach(v=>vehicle(v));carsWest.forEach(v=>vehicle(v));drawBus();drawTow();drawAmbulance();
+  if(officer)person(W*.45,e-118,"#4d9ee9","TRAFFIC POLICE");
+  if(crew)person(Math.min(tow.x+18,bus.x-48),H*.75,"#f0ae43","ROAD CREW");
+  person(W*.17,H*.80,"#59d6c8","CITY RANGER");
 
-  x.fillStyle="#587a61";x.fillRect(W*.48,grass,125,H*.58);
-  x.fillStyle="#82ad7d";x.fillRect(W*.50,grass+18,84,H*.54);
-  x.fillStyle="#cadfd2";x.beginPath();x.arc(W*.54,H*.63,74,0,7);x.fill();
-  x.fillStyle="#83a5ac";x.beginPath();x.arc(W*.54,H*.63,57,0,7);x.fill();
-
-  traffic.forEach(v=>car(v.x,roadY-11,42,v.color));
-  bus(busX,roadY-11);
-  if(stage>=2)towTruck(towX,roadY+28);
-  ambulance(ambulanceX,roadY-46);
-
-  if(officer)person(W*.44,roadY-118,"#4f9fe8","OFFICER");
-  if(crew&&towX>W*.1)person(Math.min(towX+20,busX-52),roadY+67,"#ffb94c","TOW CREW");
-  person(W*.18,H*.79,"#57d8cb","RANGER");
-
-  x.fillStyle=stage>=1?"#59e0a0":"#ea5d56";
-  x.beginPath();x.arc(W*.45,roadY-48,18,0,7);x.fill();
-  x.fillStyle="#102434";x.font="bold 9px Arial";x.fillText(stage>=1?"GO":"STOP",W*.439,roadY-45);
-
+  if(cones){for(let k=0;k<6;k++){let q=W*.43+k*28;X.fillStyle="#ff8c39";X.beginPath();X.moveTo(q,e+36);X.lineTo(q+11,e+36);X.lineTo(q+5.5,e+17);X.fill()}}
+  X.fillStyle=phase>=1?"#58e0a0":"#ed5d56";X.beginPath();X.arc(W*.45,e-48,18,0,7);X.fill();X.fillStyle="#102536";X.font="bold 9px Arial";X.fillText(phase>=1?"GO":"STOP",W*.439,e-45);
+  X.strokeStyle="rgba(220,240,255,.35)";X.lineWidth=1;rain.forEach(r=>{X.beginPath();X.moveTo(r.x,r.y);X.lineTo(r.x-2,r.y+r.s);X.stroke()});
   requestAnimationFrame(loop);
 }
-function loop(now){
-  let dt=Math.min(.05,(now-last)/1000||0);last=now;
-  update(dt);draw();
-}
+function loop(now){let dt=Math.min(.05,(now-last)/1000||0);last=now;update(dt);draw()}
 requestAnimationFrame(loop);
 </script>
 </body>
