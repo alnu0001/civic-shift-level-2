@@ -48,7 +48,7 @@ function laneCars(cars,dir,stopLine,green,dt){
   });
 }
 function verticalCars(cars,dir,stopLine,green,dt){
-  cars.sort((a,b)=>dir>0?a.y-b.y:b.y-a.y);
+  cars.sort((a,b)=>dir>0?b.y-a.y:a.y-b.y);
   cars.forEach((car,index)=>{
     car.speed ??= 0;
     let target=green?car.v:0;
