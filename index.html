@@ -14,9 +14,9 @@ const C=document.querySelector("#game"),G=C.getContext("2d"),$=s=>document.query
 function resize(){W=C.width=innerWidth;H=C.height=innerHeight;setup()}addEventListener("resize",resize);
 function setup(){const cx=W*.52,ys=[H*.43,H*.49,H*.59,H*.65],xs=[cx-34,cx+34];lanes={
  e1:{axis:"h",dir:1,fixed:ys[0],stop:cx-88},e2:{axis:"h",dir:1,fixed:ys[1],stop:cx-88},
- w1:{axis:"h",dir:-1,fixed:ys[2],stop:cx+88},w2:{axis:"h",dir:-1,fixed:ys[3],stop:cx+88},
+ w1:{axis:"h",dir:-1,fixed:ys[2],stop:W-(cx+88)},w2:{axis:"h",dir:-1,fixed:ys[3],stop:W-(cx+88)},
  n1:{axis:"v",dir:1,fixed:xs[0],stop:H*.39},n2:{axis:"v",dir:1,fixed:xs[1],stop:H*.39},
- s1:{axis:"v",dir:-1,fixed:xs[0],stop:H*.71},s2:{axis:"v",dir:-1,fixed:xs[1],stop:H*.71}};
+ s1:{axis:"v",dir:-1,fixed:xs[0],stop:H-H*.71},s2:{axis:"v",dir:-1,fixed:xs[1],stop:H-H*.71}};
  cars=[];["e1","e2","w1","w2","n1","n2","s1","s2"].forEach((l,k)=>{for(let i=0;i<3;i++)cars.push({lane:l,s:80+i*110+(k%2)*37,speed:0,target:.55+(i%2)*.10,len:44,color:["#4f9ee7","#df7fc5","#efb742","#64c2bb","#f4f3ef","#947ee0"][k%6]})});
  bus={x:cx-18,y:ys[3],angle:0,turn:0,clear:false};tow={x:cx+34,y:H+90,angle:-Math.PI/2,mode:"wait",ready:false};ambulance={x:-100,y:ys[3],speed:0};}
 function sound(f,d=.15,type="sine",v=.04){if(!audio)return;let o=audio.createOscillator(),g=audio.createGain();o.type=type;o.frequency.value=f;g.gain.value=v;o.connect(g).connect(audio.destination);o.start();g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+d);o.stop(audio.currentTime+d)}
